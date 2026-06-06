@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- Build Configuration -->
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <!-- Package Metadata -->
+    <PropertyGroup>
+        <PackageId>AutoAnalyst.Console</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Michael Descy</Authors>
+        <Description>Data analysis automator</Description>
+        <Copyright>Copyright © 2026</Copyright>
+    </PropertyGroup>
+    <!-- License & Repository Information -->
+    <PropertyGroup>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/mjdescy/auto-analyzer</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/mjdescy/auto-analyzer</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+    <!-- Package Assets -->
+    <PropertyGroup>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageTags>data;analysis;automation</PackageTags>
+    </PropertyGroup>
+</Project>

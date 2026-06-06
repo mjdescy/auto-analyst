@@ -1,4 +1,4 @@
-# ACL Replacement
+# Auto-Analyst
 
 This program aims to replace [ACL Analytics][1] for the specific tasks I use it for, which include the following:
 
@@ -31,10 +31,10 @@ First, generate a configuration file using the console app:
 
 ```sh
 # Generate a configuration file in the current working directory.
-acl-replacement init
+auto-analyst init
 
 # Generate a configuration file in another directory.
-acl-replacement init --output ~/project/config.json
+auto-analyst init --output ~/project/config.json
 ```
 
 Next, edit the generated configuration file in a text editor.
@@ -43,5 +43,5 @@ Finally, run the console app with the configuration file:
 
 ```sh
 # Run the process defined in config.json.
-acl-replacement run config.json
+auto-analyst run config.json
 ```

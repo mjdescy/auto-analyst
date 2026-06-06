@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AutoAnalyst.Console/AutoAnalyst.Console.csproj" />
+    <Project Path="src/AutoAnalyst.Library/AutoAnalyst.Library.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AutoAnalyst.Console.Tests/AutoAnalyst.Console.Tests.csproj" />
+    <Project Path="tests/AutoAnalyst.Library.Tests/AutoAnalyst.Library.Tests.csproj" />
+  </Folder>
+
+  <!-- Release build: produce a single .exe file and omit debug symbols -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+</Solution>
