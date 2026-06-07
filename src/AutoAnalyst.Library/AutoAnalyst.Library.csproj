@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <!-- Build Configuration -->
     <PropertyGroup>
@@ -26,4 +26,7 @@
         <PackageIcon>icon.png</PackageIcon>
         <PackageTags>data;analysis;automation</PackageTags>
     </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="DuckDB.NET.Data.Full" Version="1.5.3" />
+    </ItemGroup>
 </Project>

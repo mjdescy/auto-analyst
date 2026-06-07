@@ -4,7 +4,6 @@
     <Project Path="src/AutoAnalyst.Library/AutoAnalyst.Library.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/AutoAnalyst.Console.Tests/AutoAnalyst.Console.Tests.csproj" />
     <Project Path="tests/AutoAnalyst.Library.Tests/AutoAnalyst.Library.Tests.csproj" />
   </Folder>
 
