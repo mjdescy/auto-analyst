@@ -17,11 +17,11 @@ public static class SqlCommandStringBuilder
         IEnumerable<string>? integerColumnNames = null)
     {
         return GetImportDelimitedFileCommand(
-            dataFileGlobPattern, 
-            tableName, 
-            delimiter: ",", 
-            dateColumnNames, 
-            decimalColumnNames, 
+            dataFileGlobPattern,
+            tableName,
+            delimiter: ",",
+            dateColumnNames,
+            decimalColumnNames,
             integerColumnNames);
     }
 
@@ -33,11 +33,11 @@ public static class SqlCommandStringBuilder
         IEnumerable<string>? integerColumnNames = null)
     {
         return GetImportDelimitedFileCommand(
-            dataFileGlobPattern, 
-            tableName, 
-            delimiter: "\t", 
-            dateColumnNames, 
-            decimalColumnNames, 
+            dataFileGlobPattern,
+            tableName,
+            delimiter: "\t",
+            dateColumnNames,
+            decimalColumnNames,
             integerColumnNames);
     }
 
@@ -49,7 +49,7 @@ public static class SqlCommandStringBuilder
             CREATE OR REPLACE TABLE {tableName} AS
             SELECT *, filename
             FROM read_parquet(
-                '{dataFileGlobPattern.EscapeSingleQuote()}
+                '{dataFileGlobPattern.EscapeSingleQuote()}',
                 union_by_name = true,
                 file_row_number = true
             ');
