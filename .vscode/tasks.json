@@ -1,0 +1,45 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "dotnet",
+			"task": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "dotnet: build"
+		},
+		{
+			"type": "dotnet",
+			"task": "test",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "dotnet: test"
+		},
+		{
+			"type": "dotnet",
+			"task": "clean",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: clean"
+		},
+		{
+			"type": "dotnet",
+			"task": "restore",
+			"problemMatcher": [],
+			"label": "dotnet: restore"
+		},
+		{
+			"type": "dotnet",
+			"task": "watch",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "dotnet: watch"
+		}
+	]
+}
