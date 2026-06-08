@@ -1,15 +1,18 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-	"name": "C# (.NET)",
-	"image": "mcr.microsoft.com/devcontainers/dotnet",
+    "name": "C# (.NET)",
+    "image": "mcr.microsoft.com/devcontainers/dotnet",
     "features": {
-        "ghcr.io/danzilberdan/devcontainers/opencode:0": {},
+        "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/just:1": {},
         "ghcr.io/jsburckhardt/devcontainer-features/lazygit:1": {},
-        "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {}
+        "ghcr.io/jsburckhardt/devcontainer-features/opencode:1": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/yazi:1": {}
     },
     "mounts": [
-        "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/tmp/opencode-auth.json,type=bind,consistency=cached"
+        "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/tmp/opencode-auth.json,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/opencode,target=/home/vscode/.config/opencode,type=bind,consistency=cached"
     ],
     "customizations": {
         "vscode": {
@@ -18,8 +21,9 @@
                 "ms-dotnettools.vscode-dotnet-runtime",
                 "GitHub.copilot",
                 "GitHub.copilot-chat",
-				"DenizhanDaklr.opencode-go-for-copilot",
-				"yzhang.markdown-all-in-one"
+                "DenizhanDaklr.opencode-go-for-copilot",
+                "yzhang.markdown-all-in-one",
+                "sst-dev.opencode"
             ]
         }
     }
