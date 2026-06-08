@@ -1,0 +1,16 @@
+{
+    "dotnet.defaultSolution": "AutoAnalyst.slnx",
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.testWindow.allowParallelTestExecution": true,
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true
+    },
+    "[csharp]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeUsings": "explicit"
+        }
+    },
+    "omnisharp.enableEditorConfigSupport": true
+}
