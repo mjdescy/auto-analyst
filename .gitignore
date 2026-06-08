@@ -480,3 +480,15 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# AI coding instructions and settings
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+codex.md
+GEMINI.md
+.opencode
+.claude
+.github
+.codex
+.gemini
