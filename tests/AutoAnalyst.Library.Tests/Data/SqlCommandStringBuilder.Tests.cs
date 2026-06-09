@@ -19,9 +19,8 @@ public class SqlCommandStringBuilderTests
                 'data/*.csv',
                 delim = ',',
                 all_varchar = true,
-                types = {}
                 union_by_name = true, 
-                filename = true,
+                filename = true
             );
             """;
         Assert.Equal(expected, result);
@@ -127,7 +126,7 @@ public class SqlCommandStringBuilderTests
             delimiter: ",",
             dateColumnNames: Enumerable.Empty<string>());
 
-        Assert.Contains("types = {}", result);
+        Assert.DoesNotContain("types", result);
     }
 
     [Fact]
@@ -141,7 +140,7 @@ public class SqlCommandStringBuilderTests
             decimalColumnNames: null,
             integerColumnNames: null);
 
-        Assert.Contains("types = {}", result);
+        Assert.DoesNotContain("types", result);
     }
 
     [Fact]
@@ -203,9 +202,8 @@ public class SqlCommandStringBuilderTests
                 'data/*.csv',
                 delim = ',',
                 all_varchar = true,
-                types = {}
                 union_by_name = true, 
-                filename = true,
+                filename = true
             );
             """;
         Assert.Equal(expected, result);
@@ -250,7 +248,7 @@ public class SqlCommandStringBuilderTests
             decimalColumnNames: null,
             integerColumnNames: null);
 
-        Assert.Contains("types = {}", result);
+        Assert.DoesNotContain("types", result);
         Assert.Contains("delim = ','", result);
     }
 
@@ -291,7 +289,7 @@ public class SqlCommandStringBuilderTests
             decimalColumnNames: null,
             integerColumnNames: null);
 
-        Assert.Contains("types = {}", result);
+        Assert.DoesNotContain("types", result);
         Assert.Contains("delim = '\t'", result);
     }
 
@@ -306,10 +304,10 @@ public class SqlCommandStringBuilderTests
             CREATE OR REPLACE TABLE my_table AS
             SELECT *, filename
             FROM read_parquet(
-                'data/*.parquet
+                'data/*.parquet',
                 union_by_name = true,
                 file_row_number = true
-            ');
+            );
             """;
         Assert.Equal(expected, result);
     }
