@@ -368,4 +368,146 @@ public class SqlCommandStringBuilderTests
 
         Assert.Equal("", result);
     }
+
+    // GetPullSampleCommand Tests
+
+    [Fact]
+    public void GetPullSampleCommand_DefaultParameters_GeneratesCorrectSql()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "customers",
+            sampleTableName: "sample_customers",
+            sampleSize: 100,
+            randomSeed: 42);
+
+        var expected = """
+            SET threads = 1;
+            CREATE OR REPLACE SEQUENCE sample_customers_sample_id_sequence;            
+            CREATE OR REPLACE TABLE sample_customers AS
+            SELECT
+            "sample_id": nextval('sample_customers_sample_id_sequence'),
+            *,
+            "random_number_generator_seed": 42
+            FROM customers
+            USING SAMPLE RESERVOIR(100 ROWS)
+            REPEATABLE(42);
+            RESET threads;
+            """;
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_SchemaQualifiedTableNames_InterpolatesCorrectly()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "raw_data.customers",
+            sampleTableName: "analytics.sample_customers",
+            sampleSize: 500,
+            randomSeed: 123);
+
+        Assert.Contains("CREATE OR REPLACE TABLE analytics.sample_customers AS", result);
+        Assert.Contains("CREATE OR REPLACE SEQUENCE analytics.sample_customers_sample_id_sequence", result);
+        Assert.Contains("FROM raw_data.customers", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_SampleSizeOne_InterpolatesCorrectly()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "t",
+            sampleTableName: "sample_t",
+            sampleSize: 1,
+            randomSeed: 0);
+
+        Assert.Contains("RESERVOIR(1 ROWS)", result);
+        Assert.Contains("REPEATABLE(0)", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_LargeSampleSize_InterpolatesCorrectly()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "big_table",
+            sampleTableName: "sample_big_table",
+            sampleSize: 999999,
+            randomSeed: 1);
+
+        Assert.Contains("RESERVOIR(999999 ROWS)", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_NegativeRandomSeed_InterpolatesCorrectly()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "t",
+            sampleTableName: "sample_t",
+            sampleSize: 10,
+            randomSeed: -42);
+
+        Assert.Contains("REPEATABLE(-42)", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_ContainsSetThreads()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "t",
+            sampleTableName: "sample_t",
+            sampleSize: 10,
+            randomSeed: 1);
+
+        Assert.Contains("SET threads = 1;", result);
+        Assert.Contains("RESET threads;", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_ContainsSequenceCreation()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "source",
+            sampleTableName: "sample_table",
+            sampleSize: 10,
+            randomSeed: 1);
+
+        Assert.Contains("CREATE OR REPLACE SEQUENCE sample_table_sample_id_sequence;", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_ContainsReservoirSampling()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "source",
+            sampleTableName: "sample_t",
+            sampleSize: 50,
+            randomSeed: 7);
+
+        Assert.Contains("USING SAMPLE RESERVOIR(50 ROWS)", result);
+        Assert.Contains("REPEATABLE(7)", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_ContainsSampleIdColumn()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "source",
+            sampleTableName: "sample_t",
+            sampleSize: 10,
+            randomSeed: 1);
+
+        Assert.Contains("\"sample_id\": nextval('sample_t_sample_id_sequence')", result);
+    }
+
+    [Fact]
+    public void GetPullSampleCommand_IdenticalSourceAndSampleTableNames_AllowsOverwrite()
+    {
+        var result = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName: "test_table",
+            sampleTableName: "test_table",
+            sampleSize: 10,
+            randomSeed: 1);
+
+        Assert.Contains("CREATE OR REPLACE SEQUENCE test_table_sample_id_sequence;", result);
+        Assert.Contains("CREATE OR REPLACE TABLE test_table AS", result);
+        Assert.Contains("FROM test_table", result);
+    }
 }
