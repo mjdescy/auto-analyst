@@ -492,3 +492,9 @@ GEMINI.md
 .github
 .codex
 .gemini
+
+# Output
+target/
+
+# Stuff that is not yet integrated into the codebase
+.private/
