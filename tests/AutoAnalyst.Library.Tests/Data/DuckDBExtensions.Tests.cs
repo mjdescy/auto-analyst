@@ -132,6 +132,58 @@ public class DuckDBExtensionsTests
     }
 
     // ──────────────────────────────────────────────
+    // EscapeIdentifier tests
+    // ──────────────────────────────────────────────
+
+    [Fact]
+    public void EscapeIdentifier_EmptyString_ReturnsQuotedEmptyString()
+    {
+        var result = string.Empty.EscapeIdentifier();
+
+        Assert.Equal("\"\"", result);
+    }
+
+    [Fact]
+    public void EscapeIdentifier_SimpleIdentifier_ReturnsQuotedIdentifier()
+    {
+        var result = "my_table".EscapeIdentifier();
+
+        Assert.Equal("\"my_table\"", result);
+    }
+
+    [Fact]
+    public void EscapeIdentifier_ContainsDoubleQuotes_DoublesThem()
+    {
+        var result = "my\"table".EscapeIdentifier();
+
+        Assert.Equal("\"my\"\"table\"", result);
+    }
+
+    [Fact]
+    public void EscapeIdentifier_MultipleDoubleQuotes_AllDoubled()
+    {
+        var result = "\"a\"b\"".EscapeIdentifier();
+
+        Assert.Equal("\"\"\"a\"\"b\"\"\"", result);
+    }
+
+    [Fact]
+    public void EscapeIdentifier_SchemaQualified_QuotesEntireString()
+    {
+        var result = "schema.table".EscapeIdentifier();
+
+        Assert.Equal("\"schema.table\"", result);
+    }
+
+    [Fact]
+    public void EscapeIdentifier_NoSpecialCharacters_ReturnsQuotedString()
+    {
+        var result = "simple_name_123".EscapeIdentifier();
+
+        Assert.Equal("\"simple_name_123\"", result);
+    }
+
+    // ──────────────────────────────────────────────
     // ToDuckDbMapLiteral tests
     // ──────────────────────────────────────────────
 

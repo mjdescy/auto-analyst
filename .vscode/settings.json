@@ -12,5 +12,6 @@
             "source.organizeUsings": "explicit"
         }
     },
-    "omnisharp.enableEditorConfigSupport": true
+    "omnisharp.enableEditorConfigSupport": true,
+    "terminal.integrated.fontFamily": "monospace"
 }

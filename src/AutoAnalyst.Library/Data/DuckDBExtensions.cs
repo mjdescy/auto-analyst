@@ -6,9 +6,9 @@ namespace AutoAnalyst.Library.Data;
 /// </summary>
 public static class DuckDbExtensions
 {
-    
+
     public static Dictionary<string, string> TransformToDictionary(
-        this IEnumerable<string>? keys, 
+        this IEnumerable<string>? keys,
         string valueForAllKeys)
     {
         return keys?.Distinct().ToDictionary(key => key, _ => valueForAllKeys) ?? [];
@@ -44,5 +44,16 @@ public static class DuckDbExtensions
     public static string EscapeSingleQuote(this string value)
     {
         return value?.Replace("'", "''") ?? "";
+    }
+
+    /// <summary>
+    /// Escapes a string value for safe inclusion in a DuckDB SQL query by wrapping it in double quotes.
+    /// </summary>
+    /// <param name="value">The string to escape.</param>
+    /// <returns>value wrapped in double quotes, with any double quotes within value doubled</returns>
+    public static string EscapeIdentifier(this string value)
+    {
+        // DuckDB uses double quotes for identifiers
+        return $"\"{value.Replace("\"", "\"\"")}\"";
     }
 }
