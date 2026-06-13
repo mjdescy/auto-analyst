@@ -62,4 +62,31 @@ public static class SqlCommandRunner
 
         return databaseEngine.ExecuteCommand(importCommand);
     }
+
+    /// <summary>
+    /// Run a SQL command to pull a sample.
+    /// </summary>
+    /// <param name="databaseEngine">The database engine thta executes the command.</param>
+    /// <param name="sourceTableName">The database table to pull the sample from.</param>
+    /// <param name="sampleTableName">The database table to output the sample to.</param>
+    /// <param name="sampleSize">The number of records to output to the sample table.</param>
+    /// <param name="randomSeed">A random number generator seed.</param>
+    /// <returns>The number of affected (inserted or updated) rows.</returns>
+    public static int RunPullSampleCommand(
+        DatabaseEngine databaseEngine,
+        string sourceTableName,
+        string sampleTableName,
+        int sampleSize,
+        int randomSeed
+    )
+    {
+        var command = SqlCommandStringBuilder.GetPullSampleCommand(
+            sourceTableName,
+            sampleTableName,
+            sampleSize,
+            randomSeed
+        );
+
+        return databaseEngine.ExecuteCommand(command);
+    }
 }
