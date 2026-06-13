@@ -288,6 +288,8 @@ public static class SqlCommandStringBuilder
     /// returns the first N rows from the source table, the backup rows will be the next M rows from the source table.
     /// </param>
     /// <param name="randomSeed">A random number generator seed.</param>
+    /// <param name="primarySampleCategoryName">The value to output to the "sample_type" column for primary samples.</param>
+    /// <param name="backupSampleCategoryName">The value to output to the "sample_type" column for backup samples.</param>
     /// <returns>The generated SQL command text</returns>
     /// <exception cref="ArgumentException">Thrown when sourceTableName is null, empty, or only whitespace; when
     /// backupTableName is null, empty, or only whitespace; when primarySampleSize is negative; when backupSampleSiz
@@ -324,16 +326,19 @@ public static class SqlCommandStringBuilder
             CREATE OR REPLACE SEQUENCE {sequenceName};
             CREATE OR REPLACE TABLE {sampleTableName.EscapeIdentifier()} AS
             SELECT
-            "sample_id": nextval('serial'),
-            "sample_type": CASE
-                WHEN "sample_id" <= {primarySampleSize} THEN '{primarySampleCategoryName}'
-                ELSE '{backupSampleCategoryName}'
-            END,
-            *,
-            "random_number_generator_seed": {randomSeed}
-            FROM {sourceTableName.EscapeIdentifier()}
-            USING SAMPLE RESERVOIR({combinedSampleSize} ROWS)
-            REPEATABLE({randomSeed});
+                "sample_id",
+                CASE
+                    WHEN "sample_id" <= {primarySampleSize} THEN '{primarySampleCategoryName}'
+                    ELSE '{backupSampleCategoryName}'
+                END AS "sample_type",
+                *,
+                {randomSeed} AS "random_number_generator_seed"
+            FROM (
+                SELECT nextval('{sequenceName}') AS "sample_id", *
+                FROM {sourceTableName.EscapeIdentifier()}
+                USING SAMPLE RESERVOIR({combinedSampleSize} ROWS)
+                REPEATABLE({randomSeed})
+            );
             RESET threads;
             """;
 

@@ -528,16 +528,19 @@ public class SqlCommandStringBuilderTests
             CREATE OR REPLACE SEQUENCE sample_customers_sample_id_sequence;
             CREATE OR REPLACE TABLE "sample_customers" AS
             SELECT
-            "sample_id": nextval('serial'),
-            "sample_type": CASE
-                WHEN "sample_id" <= 100 THEN 'Primary'
-                ELSE 'Backup'
-            END,
-            *,
-            "random_number_generator_seed": 42
-            FROM "customers"
-            USING SAMPLE RESERVOIR(120 ROWS)
-            REPEATABLE(42);
+                "sample_id",
+                CASE
+                    WHEN "sample_id" <= 100 THEN 'Primary'
+                    ELSE 'Backup'
+                END AS "sample_type",
+                *,
+                42 AS "random_number_generator_seed"
+            FROM (
+                SELECT nextval('sample_customers_sample_id_sequence') AS "sample_id", *
+                FROM "customers"
+                USING SAMPLE RESERVOIR(120 ROWS)
+                REPEATABLE(42)
+            );
             RESET threads;
             """;
         Assert.Equal(expected, result);
@@ -625,7 +628,7 @@ public class SqlCommandStringBuilderTests
             backupSampleSize: 5,
             randomSeed: 42);
 
-        Assert.Contains("\"random_number_generator_seed\": 42", result);
+        Assert.Contains("42 AS \"random_number_generator_seed\"", result);
     }
 
     [Fact]
@@ -638,7 +641,7 @@ public class SqlCommandStringBuilderTests
             backupSampleSize: 5,
             randomSeed: 1);
 
-        Assert.Contains("\"sample_id\": nextval('serial')", result);
+        Assert.Contains("nextval('sample_t_sample_id_sequence') AS \"sample_id\"", result);
     }
 
     [Fact]
