@@ -1,5 +1,10 @@
 {
   "features": {
+    "ghcr.io/devcontainers-extra/features/micro:1": {
+      "version": "1.0.7",
+      "resolved": "ghcr.io/devcontainers-extra/features/micro@sha256:f1651293717a8d9d3e9919b3b100615edb05d2191b58b6672e741bf4d457ddf0",
+      "integrity": "sha256:f1651293717a8d9d3e9919b3b100615edb05d2191b58b6672e741bf4d457ddf0"
+    },
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {
       "version": "1.1.1",
       "resolved": "ghcr.io/eitsupi/devcontainer-features/duckdb-cli@sha256:ca2ee28c9dd192ffcb1d8ffe92f6e9b8a60c846a9452ab583e0339f6d4277fe2",

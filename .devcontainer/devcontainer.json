@@ -2,13 +2,14 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
     "name": "C# (.NET)",
-    "image": "mcr.microsoft.com/devcontainers/dotnet",
+    "image": "mcr.microsoft.com/devcontainers/dotnet:10.0",
     "features": {
         "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {},
         "ghcr.io/jsburckhardt/devcontainer-features/just:1": {},
         "ghcr.io/jsburckhardt/devcontainer-features/lazygit:1": {},
         "ghcr.io/jsburckhardt/devcontainer-features/opencode:1": {},
-        "ghcr.io/jsburckhardt/devcontainer-features/yazi:1": {}
+        "ghcr.io/jsburckhardt/devcontainer-features/yazi:1": {},
+        "ghcr.io/devcontainers-extra/features/micro:1": {}
     },
     "mounts": [
         "source=${localEnv:HOME}/.local/share/opencode/auth.json,target=/tmp/opencode-auth.json,type=bind,consistency=cached",
@@ -22,9 +23,13 @@
                 "GitHub.copilot",
                 "GitHub.copilot-chat",
                 "DenizhanDaklr.opencode-go-for-copilot",
-                "yzhang.markdown-all-in-one",
-                "sst-dev.opencode"
+                "yzhang.markdown-all-in-one"
             ]
         }
+    },
+    "remoteEnv": {
+        "EDITOR": "micro",
+        "VISUAL": "micro",
+        "GIT_EDITOR": "micro"
     }
 }

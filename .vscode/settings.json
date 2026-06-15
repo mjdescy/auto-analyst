@@ -1,6 +1,5 @@
 {
     "dotnet.defaultSolution": "AutoAnalyst.slnx",
-    "dotnet.preferCSharpExtension": true,
     "dotnet.testWindow.allowParallelTestExecution": true,
     "files.exclude": {
         "**/bin": true,
