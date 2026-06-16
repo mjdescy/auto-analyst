@@ -5,33 +5,6 @@ namespace AutoAnalyst.Library.Tests.Data;
 public class SqlCommandRunnerTests
 {
     // ──────────────────────────────────────────────
-    // RunCommand tests
-    // ──────────────────────────────────────────────
-
-    [Fact]
-    public void RunCommand_CreateTable_ReturnsZero()
-    {
-        using var db = new TempDatabase();
-
-        var result = SqlCommandRunner.RunCommand(db.Engine, "CREATE TABLE t (id INTEGER)");
-
-        Assert.Equal(0, result);
-    }
-
-    [Fact]
-    public void RunCommand_Insert_ReturnsRowCount()
-    {
-        using var db = new TempDatabase();
-        db.Engine.ExecuteCommand("CREATE TABLE t (id INTEGER, name VARCHAR)");
-
-        var result = SqlCommandRunner.RunCommand(
-            db.Engine,
-            "INSERT INTO t VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Carol')");
-
-        Assert.Equal(3, result);
-    }
-
-    // ──────────────────────────────────────────────
     // RunCommands tests
     // ──────────────────────────────────────────────
 

@@ -3,17 +3,6 @@ namespace AutoAnalyst.Library.Data;
 public static class SqlCommandRunner
 {
     /// <summary>
-    /// Runs a SQL command against the specified database engine and returns the number of affected rows.
-    /// </summary>
-    /// <param name="databaseEngine">The database engine thta executes the command.</param>
-    /// <param name="commandText">The SQL command to execute.</param>
-    /// <returns>The number of affected (inserted or updated) rows.</returns>
-    public static int RunCommand(DatabaseEngine databaseEngine, string commandText)
-    {
-        return databaseEngine.ExecuteCommand(commandText);
-    }
-
-    /// <summary>
     /// Runs an ordered list of SQL commands against the specified database engine and returns the total number of affected rows.
     /// </summary>
     /// <param name="databaseEngine">The database engine thta executes the command.</param>
