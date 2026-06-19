@@ -60,6 +60,20 @@ public class PullSampleWithBackupsSqlCommand : SqlCommandBase
         _backupSampleCategoryName = backupSampleCategoryName;
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that pulls a random sample of rows from a specified table in the database plus a
+    /// backup sample from the same source table (a continuation of the sample) and creates a new table with the 
+    /// results. The SQL statement sets the number of threads to 1 to ensure that the sampling process is performed in a
+    /// single thread, which is important for ensuring that the reservoir sampling algorithm produces a consistent
+    /// sample based on the specified random seed. A sequence is created to generate unique sample_id values for each
+    /// row in the sample, and an additional column is included to store the random number generator seed used for
+    /// reproducibility. The resulting sample table includes the sampled records along with their corresponding
+    /// sample_id and random number generator seed values, as well as a "sample_type" column that indicates whether
+    /// each row is part of the primary sample or the backup sample based on the specified category names.
+    /// Finally, the SQL statement resets the number of threads to the default setting after the sampling process is
+    /// complete. 
+    /// </summary>
+    /// <returns>The generated SQL statement.</returns>
     public override string BuildSql()
     {
         var combinedSampleSize = _primarySampleSize + _backupSampleSize;

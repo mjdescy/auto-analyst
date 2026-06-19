@@ -7,6 +7,20 @@ namespace AutoAnalyst.Library.Data;
 public static class DuckDbExtensions
 {
 
+    /// <summary>
+    /// Transforms a collection of keys into a dictionary where each key maps to the same specified value. 
+    /// This is useful for creating a column types map for DuckDB's read_csv function, where multiple columns may share
+    /// the same data type. If the input collection of keys is<returns></returns><returns></returns> null or empty, an empty dictionary is returned. The
+    /// method also ensures that the keys in the resulting dictionary are distinct to avoid duplicate key issues. 
+    /// The value for all keys is provided as a parameter, allowing for flexible assignment of data types or other
+    /// properties in the resulting dictionary.
+    /// </summary>
+    /// <param name="keys"></param>
+    /// <param name="valueForAllKeys"></param>
+    /// <returns>
+    /// A dictionary where each key from the input collection maps to the specified value, or an empty dictionary if 
+    /// the input collection is null or empty.
+    /// </returns>  
     public static Dictionary<string, string> TransformToDictionary(
         this IEnumerable<string>? keys,
         string valueForAllKeys)

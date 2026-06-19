@@ -24,6 +24,16 @@ public class ImportFileSqlCommand(
     private readonly IEnumerable<string>? _decimalColumnNames = decimalColumnNames;
     private readonly IEnumerable<string>? _integerColumnNames = integerColumnNames;
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that imports data from a file or files defined by the _dataFileGlobPattern into
+    /// a table defined by _tableName. The SQL statement generated depends on the specified _dataFileFormat. For
+    /// delimited file formats (CSV and TSV), the read_csv function is used with appropriate parameters, including the
+    /// delimiter and column types if provided. For Parquet files, the read_parquet function is used. The generated SQL
+    /// statement creates or replaces the destination table with the imported data, and includes additional columns for
+    /// row number and filename as applicable.
+    /// </summary>
+    /// <returns>The generated SQL statement.</returns>
+    /// <exception cref="NotSupportedException"></exception>
     public override string BuildSql()
     {
         return _dataFileFormat switch
@@ -35,6 +45,16 @@ public class ImportFileSqlCommand(
         };
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that imports data from delimited files (CSV or TSV) defined by the 
+    /// _dataFileGlobPattern into a table defined by _tableName using the read_csv function. The method prepares a 
+    /// column types map literal based on the provided lists of date, decimal, and integer column names, which is 
+    /// included in the read_csv function parameters if any column types are specified. The generated SQL statement 
+    /// creates or replaces the destination table with the imported data, and includes an additional column for row 
+    /// number. The delimiter parameter is set based on the specified data file format (comma for CSV and tab for TSV).
+    /// </summary>
+    /// <param name="delimiter"></param>
+    /// <returns>The generated SQL statement for importing delimited files.</returns>
     private string BuildImportDelimitedFileCommand(string delimiter)
     {
         var allColumnTypesMapLiteral = PrepareColumnTypesMapLiteral(
@@ -57,6 +77,16 @@ public class ImportFileSqlCommand(
             """;
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that imports data from Parquet files defined by the _dataFileGlobPattern into a 
+    /// table defined by _tableName using the read_parquet function. The generated SQL statement creates or replaces
+    /// the destination table with the imported data, and includes an additional column for filename. The read_parquet
+    /// function is used for Parquet files, and it does not require a column types map literal since Parquet files 
+    /// contain embedded schema information. The union_by_name parameter is set to true to allow for combining multiple
+    /// Parquet files with potentially varying schemas, and the file_row_number parameter is set to true to include 
+    /// a row number column in the resulting table.
+    /// </summary>
+    /// <returns>The generated SQL statement for importing Parquet files.</returns>
     private string BuildImportParquetFileCommand()
     {
         return $"""
@@ -70,6 +100,17 @@ public class ImportFileSqlCommand(
             """;
     }
 
+    /// <summary>
+    /// Prepares a DuckDB map literal representing the column types for the import command based on the provided lists
+    /// of date, decimal, and integer column names. The method creates a dictionary mapping each column name to its
+    /// corresponding data type (DATE, DECIMAL, INTEGER) and then converts this dictionary to a DuckDB map literal
+    /// format. If no column types are provided, an empty map literal is returned. This map literal is used in the
+    ///  generated SQL statement to specify the data types of columns when importing delimited files.
+    /// </summary>
+    /// <param name="dateColumnNames">Names of each date column</param>
+    /// <param name="decimalColumnNames">Names of each decimal column</param>
+    /// <param name="integerColumnNames">Names of each integer column</param>
+    /// <returns>A DuckDB map literal representing the column types for the import command.</returns>
     private static string PrepareColumnTypesMapLiteral(
         IEnumerable<string>? dateColumnNames,
         IEnumerable<string>? decimalColumnNames,

@@ -6,7 +6,8 @@ public class DeduplicateSqlCommand : SqlCommandBase
     private readonly string _deduplicatedTableName;
 
     /// <summary>
-    /// Creates a SQL command to deduplicate a table and output the deduplicated table to a new table.
+    /// Creates a SQL command to deduplicate a table based on all fields and output the deduplicated table to a new
+    /// table.
     /// </summary>
     /// <param name="sourceTableName">The database table to deduplicate.</param>
     /// <param name="deduplicatedTableName">The database table to output the deduplicated dataset to.</param>
@@ -22,6 +23,15 @@ public class DeduplicateSqlCommand : SqlCommandBase
         _deduplicatedTableName = deduplicatedTableName;
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that creates a deduplicated version of the source table by selecting distinct
+    /// records based on all fields. The deduplication is performed using the SELECT DISTINCT statement, which retains
+    /// only unique records in the resulting deduplicated table. This approach is a straightforward way to remove
+    /// duplicate records from the source table, but it considers all fields when determining uniqueness, meaning that
+    /// only records that are identical across all fields will be considered duplicates and removed in the deduplicated
+    /// output.
+    /// </summary>
+    /// <returns>The generated SQL statement.</returns>
     public override string BuildSql()
     {
         var sql = $"""

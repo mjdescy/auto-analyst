@@ -17,6 +17,7 @@ public class PullSampleSqlCommand : SqlCommandBase
     /// <param name="sampleTableName">The database table to output the sample to.</param>
     /// <param name="sampleSize">The number of records to output to the sample table.</param>
     /// <param name="randomSeed">A random number generator seed.</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public PullSampleSqlCommand(
         string sourceTableName,
         string sampleTableName,
@@ -40,6 +41,18 @@ public class PullSampleSqlCommand : SqlCommandBase
         _randomSeed = randomSeed;
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that pulls a random attribute sample from the source table using reservoir
+    /// sampling and creates a new table with the results. The SQL statement sets the number of threads to 1 to ensure
+    /// that the sampling process is performed in a single thread, which is important for ensuring that the reservoir
+    /// sampling algorithm produces a consistent sample based on the specified random seed. A sequence is created to
+    /// generate unique sample_id values for each row in the sample, and an additional column is included to store the
+    /// random number generator seed used for reproducibility. The resulting sample table includes the sampled records
+    /// along with their corresponding sample_id and random number generator seed values.
+    /// Finally, the SQL statement resets the number of threads to the default setting after the sampling process is
+    /// complete.
+    /// </summary>
+    /// <returns>The generated SQL statement.</returns>
     public override string BuildSql()
     {
         var sequenceName = $"{_sampleTableName}_sample_id_sequence";

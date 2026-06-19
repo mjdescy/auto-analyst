@@ -16,6 +16,7 @@ public class DeduplicateBySqlCommand : SqlCommandBase
     /// <param name="keyFieldNames">The set of key fields for which a unique combined value defines a unique record.</param>
     /// <param name="orderByFieldName">The field to use to order records that are in within each partition for row numbering</param>
     /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
     public DeduplicateBySqlCommand(
         string sourceTableName,
         string deduplicatedTableName,
@@ -44,6 +45,17 @@ public class DeduplicateBySqlCommand : SqlCommandBase
         _orderByFieldName = orderByFieldName;
     }
 
+    /// <summary>
+    /// Builds a DuckDB SQL statement that creates a deduplicated version of the source table by selecting distinct 
+    /// records based on the specified key fields. The deduplication is performed using the ROW_NUMBER() window 
+    /// function. Within each partition defined by the unique combinations of the specified key fields, records are 
+    /// ordered by the specified order by field, and a row number is assigned to each record. The resulting 
+    /// deduplicated table includes only the first occurrence of each unique combination of key field values (i.e.,
+    /// records with a row number of 1). This approach allows for more flexible deduplication based on specific key 
+    /// fields rather than all fields, while still ensuring that only one record per unique key combination is retained
+    /// in the deduplicated output.
+    /// </summary>
+    /// <returns>The generated SQL statement.</returns>
     public override string BuildSql()
     {
         var escapedKeyFieldNames = _keyFieldNames.Select(name => name.EscapeIdentifier());
