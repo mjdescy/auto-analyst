@@ -14,7 +14,7 @@ public interface ISqlCommand
     /// <summary>
     /// Executes the SQL statement for the command on a database engine.
     /// </summary>
-    /// <param name="engine">The database engine on which to run the command</param>
+    /// <param name="databaseEngine">The database engine on which to run the command</param>
     /// <returns>The number of rows affected by the command</returns>
-    int Execute(DatabaseEngine engine);
+    int Execute(DatabaseEngine databaseEngine);
 }
