@@ -37,12 +37,12 @@ with_validity AS (
     SELECT
         column_name,
         raw_value,
-        CASE
-            WHEN raw_value IS NULL                                            THEN 'null'
-            WHEN try_cast(raw_value::VARCHAR AS DATE) IS NULL                 THEN 'invalid'
-            ELSE                                                                   'valid'
-        END AS value_status,
-        try_cast(raw_value::VARCHAR AS DATE) AS date_value
+        value_status: CASE
+            WHEN raw_value IS NULL THEN 'null'
+            WHEN try_cast(raw_value::VARCHAR AS DATE) IS NULL THEN 'invalid'
+            ELSE 'valid'
+        END,
+        date_value: try_cast(raw_value::VARCHAR AS DATE)
     FROM unpivoted
 )
 
@@ -53,21 +53,21 @@ SELECT
     column_name,
 
     -- Earliest and latest dates (NULL if no valid dates exist)
-    MIN(date_value)::DATE                                          AS min_date,
-    MAX(date_value)::DATE                                          AS max_date,
+    min_date: MIN(date_value)::DATE,
+    max_date: MAX(date_value)::DATE,
 
     -- How many distinct days appear in the data
-    COUNT(DISTINCT date_value::DATE)                               AS unique_days_present,
+    unique_days_present: COUNT(DISTINCT date_value::DATE),
 
     -- Number of days in the [min, max] range that are missing from the data
-    (MAX(date_value)::DATE - MIN(date_value)::DATE + 1)
-        - COUNT(DISTINCT date_value::DATE)                         AS missing_days_count,
+    missing_days_count: (MAX(date_value)::DATE - MIN(date_value)::DATE + 1)
+        - COUNT(DISTINCT date_value::DATE),
 
     -- Value quality metrics
-    COUNT(*)                                                       AS total_rows,
-    COUNT(*) FILTER (WHERE value_status = 'null')                  AS null_count,
-    COUNT(*) FILTER (WHERE value_status = 'invalid')               AS invalid_count,
-    COUNT(*) FILTER (WHERE value_status = 'valid')                 AS valid_count
+    total_rows: COUNT(*),
+    null_count: COUNT(*) FILTER (WHERE value_status = 'null'),
+    invalid_count: COUNT(*) FILTER (WHERE value_status = 'invalid'),
+    valid_count: COUNT(*) FILTER (WHERE value_status = 'valid')
 
 FROM with_validity
 GROUP BY column_name
