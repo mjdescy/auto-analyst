@@ -38,12 +38,12 @@ with_validity AS (
     SELECT
         column_name,
         raw_value,
-        CASE
-            WHEN raw_value IS NULL                                           THEN 'null'
-            WHEN try_cast(raw_value::VARCHAR AS DOUBLE) IS NULL              THEN 'invalid'
-            ELSE                                                                  'valid'
-        END AS value_status,
-        try_cast(raw_value::VARCHAR AS DOUBLE) AS numeric_value
+        value_status: CASE
+            WHEN raw_value IS NULL THEN 'null'
+            WHEN try_cast(raw_value::VARCHAR AS DOUBLE) IS NULL THEN 'invalid'
+            ELSE 'valid'
+        END,
+        numeric_value: try_cast(raw_value::VARCHAR AS DOUBLE)
     FROM unpivoted
 )
 
@@ -54,34 +54,34 @@ SELECT
     column_name,
 
     -- Range and central tendency
-    MIN(numeric_value)                                              AS min_value,
-    MAX(numeric_value)                                              AS max_value,
-    SUM(numeric_value)                                              AS total_sum,
-    AVG(numeric_value)                                              AS mean,
-    MEDIAN(numeric_value)                                           AS median_value,
-    STDDEV_SAMP(numeric_value)                                      AS std_dev,
+    min_value: MIN(numeric_value),
+    max_value: MAX(numeric_value),
+    total_sum: SUM(numeric_value),
+    mean: AVG(numeric_value),
+    median_value: MEDIAN(numeric_value),
+    std_dev: STDDEV_SAMP(numeric_value),
 
     -- Distribution shape
-    SKEWNESS(numeric_value)                                         AS skewness,
-    KURTOSIS(numeric_value)                                         AS kurtosis,
+    skewness: SKEWNESS(numeric_value),
+    kurtosis: KURTOSIS(numeric_value),
 
     -- Quantiles
-    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY numeric_value)     AS q1,
-    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY numeric_value)     AS q3,
+    q1: PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY numeric_value),
+    q3: PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY numeric_value),
 
     -- Uniqueness
-    COUNT(DISTINCT numeric_value)                                   AS unique_values_count,
+    unique_values_count: COUNT(DISTINCT numeric_value),
 
     -- Data quality
-    COUNT(*)                                                        AS total_rows,
-    COUNT(*) FILTER (WHERE value_status = 'null')                   AS null_count,
-    COUNT(*) FILTER (WHERE value_status = 'invalid')                AS invalid_count,
-    COUNT(*) FILTER (WHERE value_status = 'valid')                  AS valid_count,
+    total_rows: COUNT(*),
+    null_count: COUNT(*) FILTER (WHERE value_status = 'null'),
+    invalid_count: COUNT(*) FILTER (WHERE value_status = 'invalid'),
+    valid_count: COUNT(*) FILTER (WHERE value_status = 'valid'),
 
     -- Business-rule checks
-    COUNT(*) FILTER (WHERE numeric_value = 0)                       AS zero_count,
-    COUNT(*) FILTER (WHERE numeric_value < 0)                       AS negative_count,
-    COUNT(*) FILTER (WHERE numeric_value > 0)                       AS positive_count
+    zero_count: COUNT(*) FILTER (WHERE numeric_value = 0),
+    negative_count: COUNT(*) FILTER (WHERE numeric_value < 0),
+    positive_count: COUNT(*) FILTER (WHERE numeric_value > 0)
 
 FROM with_validity
 GROUP BY column_name
