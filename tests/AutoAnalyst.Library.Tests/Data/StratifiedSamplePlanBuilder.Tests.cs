@@ -85,10 +85,11 @@ public class StratifiedSamplePlanBuilderTests
         var plans = builder.BuildFromTable(
             db.Engine,
             "mapping",
-            stratumNameColumn: "stratum",
-            sourceTableNameColumn: "source",
-            sampleSizeColumn: "primary_count",
-            backupSampleSizeColumn: "backup_count");
+            new MappingTableSchema(
+                StratumNameColumn: "stratum",
+                SourceTableNameColumn: "source",
+                SampleSizeColumn: "primary_count",
+                BackupSampleSizeColumn: "backup_count"));
 
         Assert.Equal(2, plans.Count);
         Assert.Equal("Region1", plans[0].StratumName);

@@ -1,5 +1,10 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that analyzes date fields in a database table,
+/// computing statistics such as min and max dates, unique days present, missing day counts,
+/// and validity counts, and stores the results in a new table.
+/// </summary>
 public class AnalyzeDateFieldsSqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
@@ -53,7 +58,7 @@ public class AnalyzeDateFieldsSqlCommand : SqlCommandBase
     public override string BuildSql()
     {
         var dataTableNamesSqlClause = string.Join(", ", _dateFieldNames.Select(name => name.EscapeIdentifier()));
-        var sql = $"""
+        return $"""
             CREATE OR REPLACE TABLE {_destinationTableName.EscapeIdentifier()} AS
             WITH unpivoted AS (
                 UNPIVOT {_sourceTableName.EscapeIdentifier()}
@@ -92,7 +97,5 @@ public class AnalyzeDateFieldsSqlCommand : SqlCommandBase
             GROUP BY column_name
             ORDER BY column_name;
             """;
-
-        return sql;
     }
 }

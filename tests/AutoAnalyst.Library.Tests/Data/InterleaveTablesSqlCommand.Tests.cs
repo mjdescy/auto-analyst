@@ -23,7 +23,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_EmptySourceTables_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: Array.Empty<(string, string)>(),
+            sourceTables: Array.Empty<SourceTableEntry>(),
             destinationTableName: "dest");
 
         Assert.Throws<ArgumentException>(act);
@@ -33,7 +33,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_BlankSourceTableName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("", "East") },
+            sourceTables: new[] { new SourceTableEntry("", "East") },
             destinationTableName: "dest");
 
         Assert.Throws<ArgumentException>(act);
@@ -43,7 +43,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_WhitespaceSourceTableName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("   ", "East") },
+            sourceTables: new[] { new SourceTableEntry("   ", "East") },
             destinationTableName: "dest");
 
         Assert.Throws<ArgumentException>(act);
@@ -53,7 +53,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_BlankStratumName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("t1", "") },
+            sourceTables: new[] { new SourceTableEntry("t1", "") },
             destinationTableName: "dest");
 
         Assert.Throws<ArgumentException>(act);
@@ -63,7 +63,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_WhitespaceStratumName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("t1", "   ") },
+            sourceTables: new[] { new SourceTableEntry("t1", "   ") },
             destinationTableName: "dest");
 
         Assert.Throws<ArgumentException>(act);
@@ -73,7 +73,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_NullDestinationTableName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("t1", "East") },
+            sourceTables: new[] { new SourceTableEntry("t1", "East") },
             destinationTableName: null!);
 
         Assert.ThrowsAny<ArgumentException>(act);
@@ -83,7 +83,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_EmptyDestinationTableName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("t1", "East") },
+            sourceTables: new[] { new SourceTableEntry("t1", "East") },
             destinationTableName: "");
 
         Assert.Throws<ArgumentException>(act);
@@ -93,7 +93,7 @@ public class InterleaveTablesSqlCommandTests
     public void Constructor_WhitespaceDestinationTableName_ThrowsArgumentException()
     {
         var act = () => new InterleaveTablesSqlCommand(
-            sourceTables: new[] { ("t1", "East") },
+            sourceTables: new[] { new SourceTableEntry("t1", "East") },
             destinationTableName: "   ");
 
         Assert.Throws<ArgumentException>(act);
@@ -107,7 +107,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_SingleTable_GeneratesCorrectSql()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("sample_east", "East")],
+            sourceTables: [new SourceTableEntry("sample_east", "East")],
             destinationTableName: "combined");
 
         var result = command.BuildSql();
@@ -124,7 +124,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_TwoTables_GeneratesCorrectSql()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("sample_east", "East"), ("sample_west", "West")],
+            sourceTables: [new SourceTableEntry("sample_east", "East"), new SourceTableEntry("sample_west", "West")],
             destinationTableName: "output");
 
         var result = command.BuildSql();
@@ -143,7 +143,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_ThreeTables_GeneratesCorrectSql()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("a", "Alpha"), ("b", "Beta"), ("c", "Gamma")],
+            sourceTables: [new SourceTableEntry("a", "Alpha"), new SourceTableEntry("b", "Beta"), new SourceTableEntry("c", "Gamma")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -164,7 +164,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_SchemaQualifiedTableNames_InterpolatesCorrectly()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("raw.east", "East"), ("raw.west", "West")],
+            sourceTables: [new SourceTableEntry("raw.east", "East"), new SourceTableEntry("raw.west", "West")],
             destinationTableName: "analytics.combined");
 
         var result = command.BuildSql();
@@ -178,7 +178,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_TableNamesWithDoubleQuotes_EscapesQuotes()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("my\"table", "East")],
+            sourceTables: [new SourceTableEntry("my\"table", "East")],
             destinationTableName: "dest\"table");
 
         var result = command.BuildSql();
@@ -191,7 +191,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_StratumNamesWithSingleQuotes_EscapesQuotes()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("t1", "It's A Stratum")],
+            sourceTables: [new SourceTableEntry("t1", "It's A Stratum")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -203,7 +203,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_ContainsStratumNameColumn()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("s1", "East"), ("s2", "West")],
+            sourceTables: [new SourceTableEntry("s1", "East"), new SourceTableEntry("s2", "West")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -215,7 +215,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_ContainsStratumPositionColumn()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("s1", "East"), ("s2", "West")],
+            sourceTables: [new SourceTableEntry("s1", "East"), new SourceTableEntry("s2", "West")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -227,7 +227,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_ContainsUnionAllByName()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("s1", "East"), ("s2", "West")],
+            sourceTables: [new SourceTableEntry("s1", "East"), new SourceTableEntry("s2", "West")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -239,7 +239,7 @@ public class InterleaveTablesSqlCommandTests
     public void BuildSql_ContainsOrderByClause()
     {
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("s1", "East"), ("s2", "West")],
+            sourceTables: [new SourceTableEntry("s1", "East"), new SourceTableEntry("s2", "West")],
             destinationTableName: "dest");
 
         var result = command.BuildSql();
@@ -261,7 +261,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO t2 VALUES (1, 'Carol', 30.0), (2, 'Dave', 40.0), (3, 'Eve', 50.0)");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("t1", "East"), ("t2", "West")],
+            sourceTables: [new SourceTableEntry("t1", "East"), new SourceTableEntry("t2", "West")],
             destinationTableName: "combined");
 
         command.Execute(db.Engine);
@@ -281,7 +281,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO c VALUES (1, 'C1'), (2, 'C2'), (3, 'C3')");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("a", "Alpha"), ("b", "Beta"), ("c", "Gamma")],
+            sourceTables: [new SourceTableEntry("a", "Alpha"), new SourceTableEntry("b", "Beta"), new SourceTableEntry("c", "Gamma")],
             destinationTableName: "combined");
 
         command.Execute(db.Engine);
@@ -297,7 +297,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO only_source VALUES (1, 'Alice', 10.0), (2, 'Bob', 20.0)");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("only_source", "Solo")],
+            sourceTables: [new SourceTableEntry("only_source", "Solo")],
             destinationTableName: "dest");
 
         command.Execute(db.Engine);
@@ -320,7 +320,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO src_b VALUES (1, 'Carol')");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("src_a", "East"), ("src_b", "West")],
+            sourceTables: [new SourceTableEntry("src_a", "East"), new SourceTableEntry("src_b", "West")],
             destinationTableName: "dest");
 
         command.Execute(db.Engine);
@@ -355,7 +355,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO s3 VALUES (1, 'Carol')");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("s1", "First"), ("s2", "Second"), ("s3", "Third")],
+            sourceTables: [new SourceTableEntry("s1", "First"), new SourceTableEntry("s2", "Second"), new SourceTableEntry("s3", "Third")],
             destinationTableName: "dest");
 
         command.Execute(db.Engine);
@@ -380,7 +380,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO t2 VALUES (1, 'B1'), (2, 'B2')");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("t1", "StratumA"), ("t2", "StratumB")],
+            sourceTables: [new SourceTableEntry("t1", "StratumA"), new SourceTableEntry("t2", "StratumB")],
             destinationTableName: "dest");
 
         command.Execute(db.Engine);
@@ -422,7 +422,7 @@ public class InterleaveTablesSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO dest VALUES (999), (888), (777)");
 
         var command = new InterleaveTablesSqlCommand(
-            sourceTables: [("src", "East")],
+            sourceTables: [new SourceTableEntry("src", "East")],
             destinationTableName: "dest");
 
         command.Execute(db.Engine);

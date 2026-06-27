@@ -13,9 +13,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_NullMappingTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: null!,
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: null!,
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -24,9 +26,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_EmptyMappingTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "",
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -35,9 +39,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_WhitespaceMappingTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "   ",
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "   ",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -46,9 +52,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_NullOutputTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "map",
-            outputTableName: null!,
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "map",
+                OutputTableName: null!,
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -57,9 +65,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_EmptyOutputTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "map",
-            outputTableName: "",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "map",
+                OutputTableName: "",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -68,9 +78,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_WhitespaceOutputTableName_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "map",
-            outputTableName: "   ",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "map",
+                OutputTableName: "   ",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -79,9 +91,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
     public void Constructor_NegativeRandomSeed_ThrowsArgumentException()
     {
         var act = () => new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "map",
-            outputTableName: "output",
-            randomSeed: -1);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "map",
+                OutputTableName: "output",
+                RandomSeed: -1,
+                Schema: MappingTableSchema.Default));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -104,9 +118,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
             """);
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
 
@@ -128,9 +144,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO sample_map VALUES ('East', 'customers_east', 10, 5)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "final_output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "final_output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
 
@@ -162,9 +180,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO sample_map VALUES ('East', 't1', 10, 5), ('West', 't2', 20, 5)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
 
@@ -192,9 +212,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO sample_map VALUES ('East', 't1', 10, 5), ('West', 't2', 20, 5), ('North', 't3', 15, 5)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "output",
-            randomSeed: 100);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "output",
+                RandomSeed: 100,
+                Schema: MappingTableSchema.Default));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
         var sampleCommands = commands.OfType<PullSampleWithBackupsSqlCommand>().ToList();
@@ -219,10 +241,12 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO sample_map VALUES ('East', 't1', 10, 5)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "output",
-            randomSeed: 42,
-            tempTablePrefix: "__my_prefix_");
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default,
+                TempTablePrefix: "__my_prefix_"));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
         var sampleCmd = Assert.IsType<PullSampleWithBackupsSqlCommand>(commands[0]);
@@ -245,9 +269,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO sample_map VALUES ('Third', 't3', 10, 5), ('First', 't1', 10, 5), ('Second', 't2', 10, 5)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "output",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "output",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         var commands = batch.BuildCommands(db.Engine).ToList();
         var interleaveCmd = Assert.IsType<InterleaveTablesSqlCommand>(commands[3]);
@@ -292,9 +318,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO customers_west VALUES (101, 'Ivy', 110.0), (102, 'Jack', 120.0), (103, 'Kate', 130.0), (104, 'Leo', 140.0), (105, 'Mia', 150.0)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "final_sample",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "final_sample",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         var result = orchestrator.ExecuteAll(db.Engine, batch);
 
@@ -346,9 +374,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO source_b VALUES (1, 'B1'), (2, 'B2'), (3, 'B3'), (4, 'B4')");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "final_sample",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "final_sample",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         orchestrator.ExecuteAll(db.Engine, batch);
 
@@ -397,9 +427,11 @@ public class PullStratifiedSampleWithBackupsBatchTests
         db.Engine.ExecuteCommand("INSERT INTO src_east VALUES (1, 'Alice', 10.0), (2, 'Bob', 20.0), (3, 'Carol', 30.0)");
 
         var batch = new PullStratifiedSampleWithBackupsBatch(
-            mappingTableName: "sample_map",
-            outputTableName: "final_sample",
-            randomSeed: 42);
+            new StratifiedSampleConfiguration(
+                MappingTableName: "sample_map",
+                OutputTableName: "final_sample",
+                RandomSeed: 42,
+                Schema: MappingTableSchema.Default));
 
         orchestrator.ExecuteAll(db.Engine, batch);
 

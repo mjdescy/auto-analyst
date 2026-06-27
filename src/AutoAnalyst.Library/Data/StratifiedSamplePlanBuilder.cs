@@ -13,25 +13,20 @@ public class StratifiedSamplePlanBuilder
     /// </summary>
     /// <param name="engine">The database engine to query.</param>
     /// <param name="mappingTableName">The name of the mapping table that contains the stratum definitions.</param>
-    /// <param name="stratumNameColumn">The column in the mapping table that holds the stratum name.</param>
-    /// <param name="sourceTableNameColumn">The column in the mapping table that holds the source table name.</param>
-    /// <param name="sampleSizeColumn">The column in the mapping table that holds the primary sample size.</param>
-    /// <param name="backupSampleSizeColumn">The column in the mapping table that holds the backup sample size.</param>
+    /// <param name="schema">The column mapping schema for the mapping table.</param>
     /// <returns>A list of <see cref="StratumPlan"/> objects, one per row in the mapping table.</returns>
     public List<StratumPlan> BuildFromTable(
         DatabaseEngine engine,
         string mappingTableName,
-        string stratumNameColumn = "stratum_name",
-        string sourceTableNameColumn = "source_table_name",
-        string sampleSizeColumn = "sample_size",
-        string backupSampleSizeColumn = "backup_sample_size")
+        MappingTableSchema? schema = null)
     {
+        var s = schema ?? MappingTableSchema.Default;
         var sql = $"""
             SELECT
-                {stratumNameColumn.EscapeIdentifier()} AS stratum_name,
-                {sourceTableNameColumn.EscapeIdentifier()} AS source_table_name,
-                CAST({sampleSizeColumn.EscapeIdentifier()} AS INTEGER) AS sample_size,
-                CAST({backupSampleSizeColumn.EscapeIdentifier()} AS INTEGER) AS backup_sample_size
+                {s.StratumNameColumn.EscapeIdentifier()} AS stratum_name,
+                {s.SourceTableNameColumn.EscapeIdentifier()} AS source_table_name,
+                CAST({s.SampleSizeColumn.EscapeIdentifier()} AS INTEGER) AS sample_size,
+                CAST({s.BackupSampleSizeColumn.EscapeIdentifier()} AS INTEGER) AS backup_sample_size
             FROM {mappingTableName.EscapeIdentifier()}
             """;
 

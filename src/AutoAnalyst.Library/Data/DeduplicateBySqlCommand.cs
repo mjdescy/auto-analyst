@@ -1,5 +1,10 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that deduplicates a table by keeping only the first
+/// occurrence of each unique combination of the specified key fields, using the ROW_NUMBER()
+/// window function, and stores the result in a new table.
+/// </summary>
 public class DeduplicateBySqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
@@ -15,8 +20,12 @@ public class DeduplicateBySqlCommand : SqlCommandBase
     /// <param name="deduplicatedTableName">The database table to output the deduplicated dataset to.</param>
     /// <param name="keyFieldNames">The set of key fields for which a unique combined value defines a unique record.</param>
     /// <param name="orderByFieldName">The field to use to order records that are in within each partition for row numbering</param>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="sourceTableName"/> or <paramref name="deduplicatedTableName"/> is blank.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="keyFieldNames"/> is <c>null</c>.
+    /// </exception>
     public DeduplicateBySqlCommand(
         string sourceTableName,
         string deduplicatedTableName,
@@ -25,24 +34,22 @@ public class DeduplicateBySqlCommand : SqlCommandBase
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTableName);
         ArgumentException.ThrowIfNullOrWhiteSpace(deduplicatedTableName);
-        if (keyFieldNames == null)
-        {
-            throw new ArgumentNullException(nameof(keyFieldNames), "The list of key field names cannot be null.");
-        }
-        if (!keyFieldNames.Any())
-        {
-            throw new ArgumentException("A list of key field names must be provided.", nameof(keyFieldNames));
-        }
-        if (keyFieldNames.Any(name => string.IsNullOrWhiteSpace(name)))
-        {
-            throw new ArgumentException("The list of key field names cannot contain blank or whitespace-only strings.", nameof(keyFieldNames));
-        }
+        ArgumentNullException.ThrowIfNull(keyFieldNames);
         ArgumentException.ThrowIfNullOrWhiteSpace(orderByFieldName);
 
         _sourceTableName = sourceTableName;
         _deduplicatedTableName = deduplicatedTableName;
         _keyFieldNames = [.. keyFieldNames];
         _orderByFieldName = orderByFieldName;
+
+        if (_keyFieldNames.Length == 0)
+        {
+            throw new ArgumentException("A list of key field names must be provided.", nameof(keyFieldNames));
+        }
+        if (_keyFieldNames.Any(name => string.IsNullOrWhiteSpace(name)))
+        {
+            throw new ArgumentException("The list of key field names cannot contain blank or whitespace-only strings.", nameof(keyFieldNames));
+        }
     }
 
     /// <summary>
@@ -60,13 +67,11 @@ public class DeduplicateBySqlCommand : SqlCommandBase
     {
         var escapedKeyFieldNames = _keyFieldNames.Select(name => name.EscapeIdentifier());
         var keyFieldsList = string.Join(", ", escapedKeyFieldNames);
-        var sql = $"""
+        return $"""
             CREATE OR REPLACE TABLE {_deduplicatedTableName.EscapeIdentifier()} AS
             SELECT DISTINCT *
             FROM {_sourceTableName.EscapeIdentifier()}
             QUALIFY ROW_NUMBER() OVER (PARTITION BY {keyFieldsList} ORDER BY {_orderByFieldName.EscapeIdentifier()}) = 1;
             """;
-
-        return sql;
     }
 }

@@ -1,6 +1,11 @@
 namespace AutoAnalyst.Library.Data;
 
 /// <summary>
+/// Identifies a source table and its corresponding stratum name for interleaving.
+/// </summary>
+public record SourceTableEntry(string SourceTableName, string StratumName);
+
+/// <summary>
 /// Creates a SQL command that merges multiple source tables into a single destination table
 /// using UNION ALL BY NAME, adding <c>stratum_name</c> and <c>stratum_position</c> columns
 /// to identify the source of each row, and ordering the result for round-robin interleaving
@@ -8,7 +13,7 @@ namespace AutoAnalyst.Library.Data;
 /// </summary>
 public class InterleaveTablesSqlCommand : SqlCommandBase
 {
-    private readonly (string SourceTableName, string StratumName)[] _sourceTables;
+    private readonly SourceTableEntry[] _sourceTables;
     private readonly string _destinationTableName;
 
     /// <summary>
@@ -19,39 +24,35 @@ public class InterleaveTablesSqlCommand : SqlCommandBase
     /// enumeration determines its <c>stratum_position</c> value (1-based).
     /// </param>
     /// <param name="destinationTableName">The database table to output the interleaved result to.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="sourceTables"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">
     /// Thrown when <paramref name="sourceTables"/> is empty, contains a blank source table name,
     /// contains a blank stratum name, or <paramref name="destinationTableName"/> is blank.
     /// </exception>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="sourceTables"/> is <c>null</c>.</exception>
     public InterleaveTablesSqlCommand(
-        IEnumerable<(string SourceTableName, string StratumName)> sourceTables,
+        IEnumerable<SourceTableEntry> sourceTables,
         string destinationTableName)
     {
         ArgumentNullException.ThrowIfNull(sourceTables);
+        ArgumentException.ThrowIfNullOrWhiteSpace(destinationTableName);
 
         _sourceTables = [.. sourceTables];
+        _destinationTableName = destinationTableName;
 
         if (_sourceTables.Length == 0)
         {
             throw new ArgumentException("A list of source tables must be provided.", nameof(sourceTables));
         }
-
         if (_sourceTables.Any(st => string.IsNullOrWhiteSpace(st.SourceTableName)))
         {
             throw new ArgumentException(
                 "The list of source tables cannot contain blank or whitespace-only table names.", nameof(sourceTables));
         }
-
         if (_sourceTables.Any(st => string.IsNullOrWhiteSpace(st.StratumName)))
         {
             throw new ArgumentException(
                 "The list of source tables cannot contain blank or whitespace-only stratum names.", nameof(sourceTables));
         }
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(destinationTableName);
-
-        _destinationTableName = destinationTableName;
     }
 
     /// <summary>
@@ -64,7 +65,6 @@ public class InterleaveTablesSqlCommand : SqlCommandBase
     public override string BuildSql()
     {
         const string unionClause = "\nUNION ALL BY NAME\n";
-
         var selectStatements = _sourceTables.Select((st, i) =>
         {
             var position = i + 1;
@@ -75,9 +75,7 @@ public class InterleaveTablesSqlCommand : SqlCommandBase
                 $"* " +
                 $"FROM {st.SourceTableName.EscapeIdentifier()}";
         });
-
         var selectStatement = string.Join(unionClause, selectStatements);
-
         return $"""
             CREATE OR REPLACE TABLE {_destinationTableName.EscapeIdentifier()} AS
             {selectStatement}

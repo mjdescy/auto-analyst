@@ -1,5 +1,9 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that deduplicates a table based on all fields
+/// and stores the deduplicated result in a new table using SELECT DISTINCT.
+/// </summary>
 public class DeduplicateSqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
@@ -32,14 +36,10 @@ public class DeduplicateSqlCommand : SqlCommandBase
     /// output.
     /// </summary>
     /// <returns>The generated SQL statement.</returns>
-    public override string BuildSql()
-    {
-        var sql = $"""
-            CREATE OR REPLACE TABLE {_deduplicatedTableName.EscapeIdentifier()} AS
-            SELECT DISTINCT *
-            FROM {_sourceTableName.EscapeIdentifier()};
-            """;
-
-        return sql;
-    }
+    public override string BuildSql() =>
+        $"""
+        CREATE OR REPLACE TABLE {_deduplicatedTableName.EscapeIdentifier()} AS
+        SELECT DISTINCT *
+        FROM {_sourceTableName.EscapeIdentifier()};
+        """;
 }

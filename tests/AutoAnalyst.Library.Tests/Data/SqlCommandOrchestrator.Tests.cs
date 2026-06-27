@@ -248,9 +248,10 @@ public class SqlCommandOrchestratorTests
             "6,Frank,600\n");
 
         var importCommand = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "raw_data");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "raw_data"));
 
         var deduplicateCommand = new DeduplicateSqlCommand(
             "raw_data",
@@ -294,22 +295,24 @@ public class SqlCommandOrchestratorTests
             "5,Eve,500\n");
 
         var importCommand = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "raw_data");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "raw_data"));
 
         var deduplicateCommand = new DeduplicateSqlCommand(
             "raw_data",
             "deduped_data");
 
         var sampleCommand = new PullSampleWithBackupsSqlCommand(
-            "deduped_data",
-            "sample_data",
-            primarySampleSize: 2,
-            backupSampleSize: 2,
-            randomSeed: 42,
-            primarySampleCategoryName: "Primary",
-            backupSampleCategoryName: "Backup");
+            new SampleConfiguration(
+                SourceTableName: "deduped_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 2,
+                BackupSampleSize: 2,
+                RandomSeed: 42,
+                PrimaryCategory: "Primary",
+                BackupCategory: "Backup"));
 
         var commands = new ISqlCommand[] { importCommand, deduplicateCommand, sampleCommand };
 

@@ -1,5 +1,11 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Provides a base implementation of <see cref="ISqlCommand"/> with a default
+/// <see cref="Execute"/> method that builds the SQL statement and runs it against
+/// a <see cref="DatabaseEngine"/>. Derived classes implement <see cref="BuildSql"/>
+/// to provide the specific SQL statement.
+/// </summary>
 public abstract class SqlCommandBase : ISqlCommand
 {
     /// <summary>

@@ -1,5 +1,9 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that generates summary statistics for a database table
+/// and stores the results in a new table.
+/// </summary>
 public class GenerateSummaryStatisticsSqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
@@ -28,11 +32,9 @@ public class GenerateSummaryStatisticsSqlCommand : SqlCommandBase
     /// Builds a DuckDB SQL statement that generate summary statistics for a table and output the results to a new table.
     /// </summary>
     /// <returns>The generated SQL statement.</returns>
-    public override string BuildSql()
-    {
-        return $"""
-            CREATE OR REPLACE TABLE {_destinationTableName.EscapeIdentifier()} AS
-            SELECT * FROM (SUMMARIZE {_sourceTableName.EscapeIdentifier()});
-            """;
-    }
+    public override string BuildSql() =>
+        $"""
+        CREATE OR REPLACE TABLE {_destinationTableName.EscapeIdentifier()} AS
+        SELECT * FROM (SUMMARIZE {_sourceTableName.EscapeIdentifier()});
+        """;
 }

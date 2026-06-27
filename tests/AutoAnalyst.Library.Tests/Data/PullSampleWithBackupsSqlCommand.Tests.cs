@@ -13,11 +13,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_NullSourceTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: null!,
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: null!,
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -27,11 +28,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_EmptySourceTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -40,11 +42,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_WhitespaceSourceTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "   ",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "   ",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -53,11 +56,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_NullSampleTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: null!,
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: null!,
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -66,11 +70,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_EmptySampleTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -79,11 +84,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_WhitespaceSampleTableName_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "   ",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "   ",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -92,11 +98,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_NegativePrimarySampleSize_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: -1,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: -1,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -105,11 +112,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_NegativeBackupSampleSize_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: -1,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: -1,
+                RandomSeed: 1));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -118,11 +126,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void Constructor_NegativeRandomSeed_ThrowsArgumentException()
     {
         var act = () => new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: -42);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: -42));
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -135,11 +144,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_DefaultParameters_GeneratesCorrectSql()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "customers",
-            sampleTableName: "sample_customers",
-            primarySampleSize: 100,
-            backupSampleSize: 20,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "customers",
+                SampleTableName: "sample_customers",
+                PrimarySampleSize: 100,
+                BackupSampleSize: 20,
+                RandomSeed: 42));
 
         var result = command.BuildSql();
 
@@ -170,11 +180,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_SchemaQualifiedTableNames_InterpolatesCorrectly()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "raw_data.customers",
-            sampleTableName: "analytics.sample_customers",
-            primarySampleSize: 500,
-            backupSampleSize: 50,
-            randomSeed: 123);
+            new SampleConfiguration(
+                SourceTableName: "raw_data.customers",
+                SampleTableName: "analytics.sample_customers",
+                PrimarySampleSize: 500,
+                BackupSampleSize: 50,
+                RandomSeed: 123));
 
         var result = command.BuildSql();
 
@@ -187,11 +198,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_CombinedSampleSize_AddsPrimaryAndBackup()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 100,
-            backupSampleSize: 50,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 100,
+                BackupSampleSize: 50,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -202,11 +214,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_CaseStatement_SetsSampleTypeCorrectly()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 100,
-            backupSampleSize: 25,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 100,
+                BackupSampleSize: 25,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -218,13 +231,14 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_CustomCategoryNames_UsedInCaseStatement()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 50,
-            backupSampleSize: 10,
-            randomSeed: 1,
-            primarySampleCategoryName: "Main",
-            backupSampleCategoryName: "Reserve");
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 50,
+                BackupSampleSize: 10,
+                RandomSeed: 1,
+                PrimaryCategory: "Main",
+                BackupCategory: "Reserve"));
 
         var result = command.BuildSql();
 
@@ -236,11 +250,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ContainsSetAndResetThreads()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -252,11 +267,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ContainsRandomSeedColumn()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 42));
 
         var result = command.BuildSql();
 
@@ -267,11 +283,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ContainsSampleIdFromSerial()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -282,11 +299,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ContainsSequenceCreation()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source",
-            sampleTableName: "sample_table",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "source",
+                SampleTableName: "sample_table",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -297,11 +315,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ZeroPrimaryAllBackup()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 0,
-            backupSampleSize: 50,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 0,
+                BackupSampleSize: 50,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -313,11 +332,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_ZeroBackupAllPrimary()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "t",
-            sampleTableName: "sample_t",
-            primarySampleSize: 100,
-            backupSampleSize: 0,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "t",
+                SampleTableName: "sample_t",
+                PrimarySampleSize: 100,
+                BackupSampleSize: 0,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -328,11 +348,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_LargeSampleSizes_InterpolatesCorrectly()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "big_table",
-            sampleTableName: "sample_big_table",
-            primarySampleSize: 500000,
-            backupSampleSize: 250000,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "big_table",
+                SampleTableName: "sample_big_table",
+                PrimarySampleSize: 500000,
+                BackupSampleSize: 250000,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -343,11 +364,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_TableNameWithDoubleQuotes_EscapesQuotes()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "my\"table",
-            sampleTableName: "sample\"table",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "my\"table",
+                SampleTableName: "sample\"table",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -359,11 +381,12 @@ public class PullSampleWithBackupsSqlCommandTests
     public void BuildSql_IdenticalSourceAndSampleTableNames_AllowsOverwrite()
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "test_table",
-            sampleTableName: "test_table",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 1);
+            new SampleConfiguration(
+                SourceTableName: "test_table",
+                SampleTableName: "test_table",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 1));
 
         var result = command.BuildSql();
 
@@ -383,11 +406,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 100);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 10,
-            backupSampleSize: 5,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 5,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -451,11 +475,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 50);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 8,
-            backupSampleSize: 4,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 8,
+                BackupSampleSize: 4,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -475,11 +500,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 50);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 8,
-            backupSampleSize: 4,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 8,
+                BackupSampleSize: 4,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -499,11 +525,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 50);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 10,
-            backupSampleSize: 0,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 10,
+                BackupSampleSize: 0,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -519,11 +546,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 50);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 0,
-            backupSampleSize: 10,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 0,
+                BackupSampleSize: 10,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -539,11 +567,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 10);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 0,
-            backupSampleSize: 0,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 0,
+                BackupSampleSize: 0,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -557,11 +586,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 20);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 15,
-            backupSampleSize: 10,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 15,
+                BackupSampleSize: 10,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -575,11 +605,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 10);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 5,
-            backupSampleSize: 3,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 5,
+                BackupSampleSize: 3,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -605,11 +636,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 10);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 5,
-            backupSampleSize: 3,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 5,
+                BackupSampleSize: 3,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -637,11 +669,12 @@ public class PullSampleWithBackupsSqlCommandTests
         CreateSourceTableWithData(db.Engine, "source_data", 10);
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 5,
-            backupSampleSize: 3,
-            randomSeed: 456);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 5,
+                BackupSampleSize: 3,
+                RandomSeed: 456));
 
         command.Execute(db.Engine);
 
@@ -664,11 +697,12 @@ public class PullSampleWithBackupsSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO source_data VALUES (1, 'Alice', 10.5), (2, 'Bob', 20.5), (3, 'Carol', 30.5)");
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 2,
-            backupSampleSize: 1,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 2,
+                BackupSampleSize: 1,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -687,11 +721,12 @@ public class PullSampleWithBackupsSqlCommandTests
         db.Engine.ExecuteCommand("INSERT INTO sample_data VALUES (999)");
 
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName: "source_data",
-            sampleTableName: "sample_data",
-            primarySampleSize: 5,
-            backupSampleSize: 3,
-            randomSeed: 42);
+            new SampleConfiguration(
+                SourceTableName: "source_data",
+                SampleTableName: "sample_data",
+                PrimarySampleSize: 5,
+                BackupSampleSize: 3,
+                RandomSeed: 42));
 
         command.Execute(db.Engine);
 
@@ -737,11 +772,12 @@ public class PullSampleWithBackupsSqlCommandTests
         int randomSeed)
     {
         var command = new PullSampleWithBackupsSqlCommand(
-            sourceTableName,
-            sampleTableName,
-            primarySampleSize,
-            backupSampleSize,
-            randomSeed);
+            new SampleConfiguration(
+                SourceTableName: sourceTableName,
+                SampleTableName: sampleTableName,
+                PrimarySampleSize: primarySampleSize,
+                BackupSampleSize: backupSampleSize,
+                RandomSeed: randomSeed));
 
         command.Execute(db.Engine);
 

@@ -1,5 +1,9 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that appends multiple source tables together
+/// into a single destination table using UNION ALL BY NAME.
+/// </summary>
 public class AppendTablesSqlCommand : SqlCommandBase
 {
     private readonly string[] _sourceTableNames;

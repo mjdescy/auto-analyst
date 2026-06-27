@@ -1,5 +1,9 @@
 namespace AutoAnalyst.Library.Data;
 
+/// <summary>
+/// Creates and executes a SQL command that pulls a random attribute sample from a database table
+/// using reservoir sampling and stores the results in a new table with a unique sample identifier.
+/// </summary>
 public class PullSampleSqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
@@ -56,7 +60,7 @@ public class PullSampleSqlCommand : SqlCommandBase
     public override string BuildSql()
     {
         var sequenceName = $"{_sampleTableName}_sample_id_sequence";
-        var sql = $"""
+        return $"""
             SET threads = 1;
             CREATE OR REPLACE SEQUENCE {sequenceName};            
             CREATE OR REPLACE TABLE {_sampleTableName.EscapeIdentifier()} AS
@@ -69,7 +73,5 @@ public class PullSampleSqlCommand : SqlCommandBase
             REPEATABLE({_randomSeed});
             RESET threads;
             """;
-
-        return sql;
     }
 }

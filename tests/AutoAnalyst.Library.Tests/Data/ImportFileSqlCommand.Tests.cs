@@ -13,9 +13,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_DefaultColumns_GeneratesCorrectSql()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "data/*.csv",
-            "my_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "data/*.csv",
+                "my_table"));
 
         var result = command.BuildSql();
 
@@ -37,10 +38,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_WithDateColumns_IncludesDateTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "file.csv",
-            "t",
-            dateColumnNames: ["created_at", "updated_at"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "file.csv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["created_at", "updated_at"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -52,10 +57,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_WithDecimalColumns_IncludesDecimalTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "file.csv",
-            "t",
-            decimalColumnNames: ["amount", "tax"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "file.csv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount", "tax"],
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -67,10 +76,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_WithIntegerColumns_IncludesIntegerTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "file.csv",
-            "t",
-            integerColumnNames: ["id", "count"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "file.csv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["id", "count"])));
 
         var result = command.BuildSql();
 
@@ -82,12 +95,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_WithAllColumnTypes_IncludesAllTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "file.csv",
-            "t",
-            dateColumnNames: ["created_at"],
-            decimalColumnNames: new[] { "amount" },
-            integerColumnNames: new[] { "id" });
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "file.csv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["created_at"],
+                    DecimalColumnNames: new[] { "amount" },
+                    IntegerColumnNames: new[] { "id" })));
 
         var result = command.BuildSql();
 
@@ -100,9 +115,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_SingleQuoteInPath_EscapesQuote()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "it's data/file.csv",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "it's data/file.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -113,10 +129,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_TableNameInterpolation_PlacedCorrectly()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "custom_schema.custom_table");
-
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "custom_schema.custom_table"));
         var result = command.BuildSql();
 
         Assert.Contains("CREATE OR REPLACE TABLE custom_schema.custom_table AS", result);
@@ -126,10 +142,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_EmptyDateColumns_GeneratesEmptyTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t",
-            dateColumnNames: Enumerable.Empty<string>());
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: Enumerable.Empty<string>(),
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -140,12 +160,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_NullColumnParameters_GeneratesEmptyTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t",
-            dateColumnNames: null,
-            decimalColumnNames: null,
-            integerColumnNames: null);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -156,9 +174,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_ContainsReadCsvWithFilename()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -170,9 +189,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_ContainsAllVarchar()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -183,9 +203,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_ContainsUnionByName()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -196,9 +217,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Csv_ContainsRowNumber()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            "f.csv",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                "f.csv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -213,10 +235,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Tsv_DefaultColumns_GeneratesCorrectSql()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            "data.tsv",
-            "tsv_table");
-
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                "data.tsv",
+                "tsv_table"));
         var result = command.BuildSql();
 
         Assert.Contains("delim = '\t'", result);
@@ -229,11 +251,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Tsv_WithColumnTypes_IncludesColumnTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            "file.tsv",
-            "t",
-            dateColumnNames: ["created_at"],
-            decimalColumnNames: new[] { "amount" });
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                "file.tsv",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["created_at"],
+                    DecimalColumnNames: new[] { "amount" },
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -246,12 +271,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Tsv_NullOptionalParams_GeneratesEmptyTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            "f.tsv",
-            "t",
-            dateColumnNames: null,
-            decimalColumnNames: null,
-            integerColumnNames: null);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                "f.tsv",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -267,10 +290,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Parquet_DefaultColumns_GeneratesCorrectSql()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Parquet,
-            "data/*.parquet",
-            "my_table");
-
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Parquet,
+                "data/*.parquet",
+                "my_table"));
         var result = command.BuildSql();
 
         var expected = """
@@ -289,10 +312,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Parquet_TableNameInterpolation_PlacedCorrectly()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Parquet,
-            "f.parquet",
-            "custom_schema.custom_table");
-
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Parquet,
+                "f.parquet",
+                "custom_schema.custom_table"));
         var result = command.BuildSql();
 
         Assert.Contains("CREATE OR REPLACE TABLE custom_schema.custom_table AS", result);
@@ -302,9 +325,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Parquet_SingleQuoteInPath_EscapesQuote()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Parquet,
-            "it's data/file.parquet",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Parquet,
+                "it's data/file.parquet",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -315,9 +339,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Parquet_ContainsReadParquetWithFilename()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Parquet,
-            "f.parquet",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Parquet,
+                "f.parquet",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -335,9 +360,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_DefaultColumns_GeneratesCorrectSql()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "data/*.json",
-            "my_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "data/*.json",
+                "my_table"));
 
         var result = command.BuildSql();
 
@@ -357,10 +383,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_WithDateColumns_IncludesColumnTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "file.json",
-            "t",
-            dateColumnNames: ["created_at", "updated_at"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "file.json",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["created_at", "updated_at"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -372,10 +402,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_WithDecimalColumns_IncludesDecimalTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "file.json",
-            "t",
-            decimalColumnNames: ["amount", "tax"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "file.json",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount", "tax"],
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -387,10 +421,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_WithIntegerColumns_IncludesIntegerTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "file.json",
-            "t",
-            integerColumnNames: ["id", "count"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "file.json",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["id", "count"])));
 
         var result = command.BuildSql();
 
@@ -402,12 +440,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_WithAllColumnTypes_IncludesAllTypes()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "file.json",
-            "t",
-            dateColumnNames: ["created_at"],
-            decimalColumnNames: new[] { "amount" },
-            integerColumnNames: new[] { "id" });
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "file.json",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["created_at"],
+                    DecimalColumnNames: new[] { "amount" },
+                    IntegerColumnNames: new[] { "id" })));
 
         var result = command.BuildSql();
 
@@ -420,9 +460,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_SingleQuoteInPath_EscapesQuote()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "it's data/file.json",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "it's data/file.json",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -433,9 +474,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_TableNameInterpolation_PlacedCorrectly()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "f.json",
-            "custom_schema.custom_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "f.json",
+                "custom_schema.custom_table"));
 
         var result = command.BuildSql();
 
@@ -446,10 +488,14 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_EmptyDateColumns_GeneratesNoColumnsParam()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "f.json",
-            "t",
-            dateColumnNames: Enumerable.Empty<string>());
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "f.json",
+                "t",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: Enumerable.Empty<string>(),
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         var result = command.BuildSql();
 
@@ -460,12 +506,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_NullColumnParameters_GeneratesNoColumnsParam()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "f.json",
-            "t",
-            dateColumnNames: null,
-            decimalColumnNames: null,
-            integerColumnNames: null);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "f.json",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -476,9 +520,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_ContainsUnionByName()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "f.json",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "f.json",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -489,9 +534,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_Json_ContainsFilename()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            "f.json",
-            "t");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                "f.json",
+                "t"));
 
         var result = command.BuildSql();
 
@@ -506,10 +552,10 @@ public class ImportFileSqlCommandTests
     public void BuildSql_UnsupportedFormat_ThrowsNotSupportedException()
     {
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Xlsx,
-            "data.xlsx",
-            "t");
-
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Xlsx,
+                "data.xlsx",
+                "t"));
         var ex = Assert.Throws<NotSupportedException>(() => command.BuildSql());
 
         Assert.Contains("Xlsx", ex.Message);
@@ -530,9 +576,10 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table"));
 
         command.Execute(db.Engine);
 
@@ -550,10 +597,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            dateColumnNames: ["event_date"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -572,10 +623,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            decimalColumnNames: ["amount"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -594,10 +649,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -616,11 +675,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            decimalColumnNames: ["amount"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -640,11 +702,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -664,11 +729,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            decimalColumnNames: ["amount"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -688,12 +756,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01,500.00,2,Large Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Csv,
-            csvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            decimalColumnNames: ["amount"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Csv,
+                csvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -718,9 +788,10 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table"));
 
         command.Execute(db.Engine);
 
@@ -738,10 +809,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            dateColumnNames: ["event_date"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -760,10 +835,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            decimalColumnNames: ["amount"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -782,10 +861,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -804,11 +887,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            decimalColumnNames: ["amount"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -828,11 +914,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -852,11 +941,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            decimalColumnNames: ["amount"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -876,12 +968,14 @@ public class ImportFileSqlCommandTests
             "2024-06-01\t500.00\t2\tLarge Item\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Tsv,
-            tsvPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            decimalColumnNames: ["amount"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Tsv,
+                tsvPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -910,9 +1004,10 @@ public class ImportFileSqlCommandTests
                 $"COPY source_data TO '{parquetPath.Replace("'", "''")}' (FORMAT PARQUET)");
 
             var command = new ImportFileSqlCommand(
-                SupportedDataFileFormat.Parquet,
-                parquetPath,
-                "imported_parquet");
+                new FileImportConfiguration(
+                    SupportedDataFileFormat.Parquet,
+                    parquetPath,
+                    "imported_parquet"));
 
             command.Execute(db.Engine);
 
@@ -939,9 +1034,10 @@ public class ImportFileSqlCommandTests
                 $"COPY source_data TO '{parquetPath.Replace("'", "''")}' (FORMAT PARQUET)");
 
             var command = new ImportFileSqlCommand(
-                SupportedDataFileFormat.Parquet,
-                parquetPath,
-                "imported_parquet");
+                new FileImportConfiguration(
+                    SupportedDataFileFormat.Parquet,
+                    parquetPath,
+                    "imported_parquet"));
 
             command.Execute(db.Engine);
 
@@ -968,9 +1064,10 @@ public class ImportFileSqlCommandTests
             "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "data_table");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "data_table"));
 
         command.Execute(db.Engine);
 
@@ -987,10 +1084,14 @@ public class ImportFileSqlCommandTests
             "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "data_table",
-            dateColumnNames: ["event_date"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -1008,10 +1109,14 @@ public class ImportFileSqlCommandTests
             "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "data_table",
-            decimalColumnNames: ["amount"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: null)));
 
         command.Execute(db.Engine);
 
@@ -1029,10 +1134,14 @@ public class ImportFileSqlCommandTests
             "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "data_table",
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: null,
+                    DecimalColumnNames: null,
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -1050,12 +1159,14 @@ public class ImportFileSqlCommandTests
             "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "data_table",
-            dateColumnNames: ["event_date"],
-            decimalColumnNames: ["amount"],
-            integerColumnNames: ["quantity"]);
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "data_table",
+                TypeHints: new ColumnTypeHints(
+                    DateColumnNames: ["event_date"],
+                    DecimalColumnNames: ["amount"],
+                    IntegerColumnNames: ["quantity"])));
 
         command.Execute(db.Engine);
 
@@ -1074,9 +1185,10 @@ public class ImportFileSqlCommandTests
             "{\"id\": 2, \"name\": \"Bob\"}\n");
 
         var command = new ImportFileSqlCommand(
-            SupportedDataFileFormat.Json,
-            jsonPath,
-            "imported_json");
+            new FileImportConfiguration(
+                SupportedDataFileFormat.Json,
+                jsonPath,
+                "imported_json"));
 
         command.Execute(db.Engine);
 
