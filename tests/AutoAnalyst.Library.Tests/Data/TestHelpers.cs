@@ -19,6 +19,13 @@ public static class TestHelpers
         return path;
     }
 
+    public static string CreateTempJsonFile(string content)
+    {
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, content);
+        return path;
+    }
+
     public static void AssertColumnType(DatabaseEngine db, string tableName, string columnName, string expectedType)
     {
         using var conn = new DuckDBConnection(db.DatabaseConnectionString);

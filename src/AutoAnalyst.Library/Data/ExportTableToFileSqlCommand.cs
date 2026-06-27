@@ -4,7 +4,7 @@ public class ExportTableToFileSqlCommand : SqlCommandBase
 {
     private readonly string _sourceTableName;
     private readonly string _destinationFilePath;
-    private readonly ExportFileFormat _exportFileFormat;
+    private readonly SupportedDataFileFormat _exportFileFormat;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExportTableToFileSqlCommand"/> class.
@@ -18,7 +18,7 @@ public class ExportTableToFileSqlCommand : SqlCommandBase
     public ExportTableToFileSqlCommand(
         string sourceTableName,
         string destinationFilePath,
-        ExportFileFormat exportFileFormat)
+        SupportedDataFileFormat exportFileFormat)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceTableName);
         ArgumentException.ThrowIfNullOrWhiteSpace(destinationFilePath);
@@ -34,7 +34,7 @@ public class ExportTableToFileSqlCommand : SqlCommandBase
     /// <returns>The generated SQL statement.</returns>
     public override string BuildSql()
     {
-        var loadExcelCommand = _exportFileFormat == ExportFileFormat.Xlsx ? "LOAD EXCEL;" : string.Empty;
+        var loadExcelCommand = _exportFileFormat == SupportedDataFileFormat.Xlsx ? "LOAD EXCEL;" : string.Empty;
         return $"""
             {loadExcelCommand}
             COPY {_sourceTableName.EscapeIdentifier()}
@@ -44,23 +44,23 @@ public class ExportTableToFileSqlCommand : SqlCommandBase
     }
 
     /// <summary>
-    /// Maps an <see cref="ExportFileFormat"/> value to its corresponding DuckDB COPY FORMAT clause.
+    /// Maps an <see cref="SupportedDataFileFormat"/> value to its corresponding DuckDB COPY FORMAT clause.
     /// </summary>
-    /// <param name="exportFileFormat">The export format to get the format string for.</param>
+    /// <param name="SupportedDataFileFormat">The export format to get the format string for.</param>
     /// <returns>A DuckDB-compatible format string for the COPY command.</returns>
     /// <exception cref="NotSupportedException">
-    /// Thrown when an unrecognized <see cref="ExportFileFormat"/> value is provided.
+    /// Thrown when an unrecognized <see cref="SupportedDataFileFormat"/> value is provided.
     /// </exception>
-    private string GetFileExportFormat(ExportFileFormat exportFileFormat)
+    private string GetFileExportFormat(SupportedDataFileFormat SupportedDataFileFormat)
     {
-        return exportFileFormat switch
+        return SupportedDataFileFormat switch
         {
-            ExportFileFormat.Csv => """(HEADER, DELIMITER ',', QUOTE '"')""",
-            ExportFileFormat.Tsv => """(HEADER, DELIMITER '\t', QUOTE '"')""",
-            ExportFileFormat.Xlsx => "(FORMAT XLSX, HEADER TRUE)",
-            ExportFileFormat.Parquet => "(FORMAT PARQUET)",
-            ExportFileFormat.Json => "(FORMAT JSON, ARRAY TRUE)",
-            _ => throw new NotSupportedException($"Export file format {exportFileFormat} is not supported.")
+            SupportedDataFileFormat.Csv => """(HEADER, DELIMITER ',', QUOTE '"')""",
+            SupportedDataFileFormat.Tsv => """(HEADER, DELIMITER '\t', QUOTE '"')""",
+            SupportedDataFileFormat.Xlsx => "(FORMAT XLSX, HEADER TRUE)",
+            SupportedDataFileFormat.Parquet => "(FORMAT PARQUET)",
+            SupportedDataFileFormat.Json => "(FORMAT JSON, ARRAY TRUE)",
+            _ => throw new NotSupportedException($"Export file format {SupportedDataFileFormat} is not supported.")
         };
     }
 }

@@ -15,7 +15,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: null!,
             destinationFilePath: "output.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -26,7 +26,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: "",
             destinationFilePath: "output.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -37,7 +37,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: "   ",
             destinationFilePath: "output.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -48,7 +48,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: null!,
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.ThrowsAny<ArgumentException>(act);
     }
@@ -59,7 +59,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -70,7 +70,7 @@ public class ExportTableToFileSqlCommandTests
         var act = () => new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "   ",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.Throws<ArgumentException>(act);
     }
@@ -81,7 +81,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/output.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         Assert.NotNull(command);
         var sql = command.BuildSql();
@@ -98,7 +98,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/file.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         var result = command.BuildSql();
 
@@ -116,7 +116,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/it's data/file.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         var result = command.BuildSql();
 
@@ -129,7 +129,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my'table",
             destinationFilePath: "/path/to/file.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         var result = command.BuildSql();
 
@@ -142,7 +142,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "schema.table",
             destinationFilePath: "/path/to/file.csv",
-            exportFileFormat: ExportFileFormat.Csv);
+            exportFileFormat: SupportedDataFileFormat.Csv);
 
         var result = command.BuildSql();
 
@@ -159,7 +159,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/file.tsv",
-            exportFileFormat: ExportFileFormat.Tsv);
+            exportFileFormat: SupportedDataFileFormat.Tsv);
 
         var result = command.BuildSql();
 
@@ -177,7 +177,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/file's.tsv",
-            exportFileFormat: ExportFileFormat.Tsv);
+            exportFileFormat: SupportedDataFileFormat.Tsv);
 
         var result = command.BuildSql();
 
@@ -194,7 +194,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/file.xlsx",
-            exportFileFormat: ExportFileFormat.Xlsx);
+            exportFileFormat: SupportedDataFileFormat.Xlsx);
 
         var result = command.BuildSql();
 
@@ -213,7 +213,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "output.xlsx",
-            exportFileFormat: ExportFileFormat.Xlsx);
+            exportFileFormat: SupportedDataFileFormat.Xlsx);
 
         var result = command.BuildSql();
 
@@ -231,7 +231,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/file.parquet",
-            exportFileFormat: ExportFileFormat.Parquet);
+            exportFileFormat: SupportedDataFileFormat.Parquet);
 
         var result = command.BuildSql();
 
@@ -253,7 +253,7 @@ public class ExportTableToFileSqlCommandTests
         var command = new ExportTableToFileSqlCommand(
             sourceTableName: "my_table",
             destinationFilePath: "/path/to/file.json",
-            exportFileFormat: ExportFileFormat.Json);
+            exportFileFormat: SupportedDataFileFormat.Json);
 
         var result = command.BuildSql();
 
@@ -281,7 +281,7 @@ public class ExportTableToFileSqlCommandTests
             var command = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: csvPath,
-                exportFileFormat: ExportFileFormat.Csv);
+                exportFileFormat: SupportedDataFileFormat.Csv);
 
             var rowsAffected = command.Execute(db.Engine);
 
@@ -311,7 +311,7 @@ public class ExportTableToFileSqlCommandTests
             var command = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: tsvPath,
-                exportFileFormat: ExportFileFormat.Tsv);
+                exportFileFormat: SupportedDataFileFormat.Tsv);
 
             var rowsAffected = command.Execute(db.Engine);
 
@@ -341,7 +341,7 @@ public class ExportTableToFileSqlCommandTests
             var command = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: xlsxPath,
-                exportFileFormat: ExportFileFormat.Xlsx);
+                exportFileFormat: SupportedDataFileFormat.Xlsx);
 
             command.Execute(db.Engine);
 
@@ -368,7 +368,7 @@ public class ExportTableToFileSqlCommandTests
             var exportCommand = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: xlsxPath,
-                exportFileFormat: ExportFileFormat.Xlsx);
+                exportFileFormat: SupportedDataFileFormat.Xlsx);
 
             exportCommand.Execute(db.Engine);
 
@@ -399,7 +399,7 @@ public class ExportTableToFileSqlCommandTests
             var exportCommand = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: parquetPath,
-                exportFileFormat: ExportFileFormat.Parquet);
+                exportFileFormat: SupportedDataFileFormat.Parquet);
 
             exportCommand.Execute(db.Engine);
 
@@ -430,7 +430,7 @@ public class ExportTableToFileSqlCommandTests
             var command = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: jsonPath,
-                exportFileFormat: ExportFileFormat.Json);
+                exportFileFormat: SupportedDataFileFormat.Json);
 
             command.Execute(db.Engine);
 
@@ -458,7 +458,7 @@ public class ExportTableToFileSqlCommandTests
             var command = new ExportTableToFileSqlCommand(
                 sourceTableName: "source_data",
                 destinationFilePath: csvPath,
-                exportFileFormat: ExportFileFormat.Csv);
+                exportFileFormat: SupportedDataFileFormat.Csv);
 
             var rowsAffected = command.Execute(db.Engine);
 

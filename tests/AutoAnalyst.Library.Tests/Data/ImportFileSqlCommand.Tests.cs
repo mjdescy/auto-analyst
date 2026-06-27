@@ -328,6 +328,177 @@ public class ImportFileSqlCommandTests
     }
 
     // ──────────────────────────────────────────────
+    // BuildSql tests - JSON
+    // ──────────────────────────────────────────────
+
+    [Fact]
+    public void BuildSql_Json_DefaultColumns_GeneratesCorrectSql()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "data/*.json",
+            "my_table");
+
+        var result = command.BuildSql();
+
+        var expected = """
+            CREATE OR REPLACE TABLE my_table AS
+            SELECT *, filename
+            FROM read_json(
+                'data/*.json',
+                format = 'auto',
+                union_by_name = true
+            );
+            """;
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_WithDateColumns_IncludesColumnTypes()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "file.json",
+            "t",
+            dateColumnNames: ["created_at", "updated_at"]);
+
+        var result = command.BuildSql();
+
+        Assert.Contains("'created_at': 'DATE'", result);
+        Assert.Contains("'updated_at': 'DATE'", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_WithDecimalColumns_IncludesDecimalTypes()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "file.json",
+            "t",
+            decimalColumnNames: ["amount", "tax"]);
+
+        var result = command.BuildSql();
+
+        Assert.Contains("'amount': 'DECIMAL'", result);
+        Assert.Contains("'tax': 'DECIMAL'", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_WithIntegerColumns_IncludesIntegerTypes()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "file.json",
+            "t",
+            integerColumnNames: ["id", "count"]);
+
+        var result = command.BuildSql();
+
+        Assert.Contains("'id': 'INTEGER'", result);
+        Assert.Contains("'count': 'INTEGER'", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_WithAllColumnTypes_IncludesAllTypes()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "file.json",
+            "t",
+            dateColumnNames: ["created_at"],
+            decimalColumnNames: new[] { "amount" },
+            integerColumnNames: new[] { "id" });
+
+        var result = command.BuildSql();
+
+        Assert.Contains("'created_at': 'DATE'", result);
+        Assert.Contains("'amount': 'DECIMAL'", result);
+        Assert.Contains("'id': 'INTEGER'", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_SingleQuoteInPath_EscapesQuote()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "it's data/file.json",
+            "t");
+
+        var result = command.BuildSql();
+
+        Assert.Contains("'it''s data/file.json'", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_TableNameInterpolation_PlacedCorrectly()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "f.json",
+            "custom_schema.custom_table");
+
+        var result = command.BuildSql();
+
+        Assert.Contains("CREATE OR REPLACE TABLE custom_schema.custom_table AS", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_EmptyDateColumns_GeneratesNoColumnsParam()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "f.json",
+            "t",
+            dateColumnNames: Enumerable.Empty<string>());
+
+        var result = command.BuildSql();
+
+        Assert.DoesNotContain("columns", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_NullColumnParameters_GeneratesNoColumnsParam()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "f.json",
+            "t",
+            dateColumnNames: null,
+            decimalColumnNames: null,
+            integerColumnNames: null);
+
+        var result = command.BuildSql();
+
+        Assert.DoesNotContain("columns", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_ContainsUnionByName()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "f.json",
+            "t");
+
+        var result = command.BuildSql();
+
+        Assert.Contains("union_by_name = true", result);
+    }
+
+    [Fact]
+    public void BuildSql_Json_ContainsFilename()
+    {
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            "f.json",
+            "t");
+
+        var result = command.BuildSql();
+
+        Assert.Contains("SELECT *, filename", result);
+    }
+
+    // ──────────────────────────────────────────────
     // BuildSql tests - Error cases
     // ──────────────────────────────────────────────
 
@@ -781,5 +952,135 @@ public class ImportFileSqlCommandTests
         {
             File.Delete(parquetPath);
         }
+    }
+
+    // ──────────────────────────────────────────────
+    // Execute tests - JSON
+    // ──────────────────────────────────────────────
+
+    [Fact]
+    public void Execute_Json_BasicImportsData()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"event_date\": \"2024-01-15\", \"amount\": 100.50, \"quantity\": 5, \"description\": \"Widget A\"}\n" +
+            "{\"event_date\": \"2024-02-20\", \"amount\": 250.75, \"quantity\": 10, \"description\": \"Widget B\"}\n" +
+            "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "data_table");
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(3, TestHelpers.GetRowCount(db.Engine, "data_table"));
+    }
+
+    [Fact]
+    public void Execute_Json_DateColumns()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"event_date\": \"2024-01-15\", \"amount\": 100.50, \"quantity\": 5, \"description\": \"Widget A\"}\n" +
+            "{\"event_date\": \"2024-02-20\", \"amount\": 250.75, \"quantity\": 10, \"description\": \"Widget B\"}\n" +
+            "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "data_table",
+            dateColumnNames: ["event_date"]);
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(3, TestHelpers.GetRowCount(db.Engine, "data_table"));
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "event_date", "DATE");
+    }
+
+    [Fact]
+    public void Execute_Json_DecimalColumns()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"event_date\": \"2024-01-15\", \"amount\": 100.50, \"quantity\": 5, \"description\": \"Widget A\"}\n" +
+            "{\"event_date\": \"2024-02-20\", \"amount\": 250.75, \"quantity\": 10, \"description\": \"Widget B\"}\n" +
+            "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "data_table",
+            decimalColumnNames: ["amount"]);
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(3, TestHelpers.GetRowCount(db.Engine, "data_table"));
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "amount", "DECIMAL");
+    }
+
+    [Fact]
+    public void Execute_Json_IntegerColumns()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"event_date\": \"2024-01-15\", \"amount\": 100.50, \"quantity\": 5, \"description\": \"Widget A\"}\n" +
+            "{\"event_date\": \"2024-02-20\", \"amount\": 250.75, \"quantity\": 10, \"description\": \"Widget B\"}\n" +
+            "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "data_table",
+            integerColumnNames: ["quantity"]);
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(3, TestHelpers.GetRowCount(db.Engine, "data_table"));
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "quantity", "INTEGER");
+    }
+
+    [Fact]
+    public void Execute_Json_AllColumnTypes()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"event_date\": \"2024-01-15\", \"amount\": 100.50, \"quantity\": 5, \"description\": \"Widget A\"}\n" +
+            "{\"event_date\": \"2024-02-20\", \"amount\": 250.75, \"quantity\": 10, \"description\": \"Widget B\"}\n" +
+            "{\"event_date\": \"2024-06-01\", \"amount\": 500.00, \"quantity\": 2, \"description\": \"Large Item\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "data_table",
+            dateColumnNames: ["event_date"],
+            decimalColumnNames: ["amount"],
+            integerColumnNames: ["quantity"]);
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(3, TestHelpers.GetRowCount(db.Engine, "data_table"));
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "event_date", "DATE");
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "amount", "DECIMAL");
+        TestHelpers.AssertColumnType(db.Engine, "data_table", "quantity", "INTEGER");
+    }
+
+    [Fact]
+    public void Execute_Json_IncludesFilenameColumn()
+    {
+        using var db = new TempDatabase();
+        var jsonPath = TestHelpers.CreateTempJsonFile(
+            "{\"id\": 1, \"name\": \"Alice\"}\n" +
+            "{\"id\": 2, \"name\": \"Bob\"}\n");
+
+        var command = new ImportFileSqlCommand(
+            SupportedDataFileFormat.Json,
+            jsonPath,
+            "imported_json");
+
+        command.Execute(db.Engine);
+
+        Assert.Equal(2, TestHelpers.GetRowCount(db.Engine, "imported_json"));
+        TestHelpers.AssertColumnExists(db.Engine, "imported_json", "filename");
     }
 }

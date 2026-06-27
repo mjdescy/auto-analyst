@@ -41,6 +41,7 @@ public class ImportFileSqlCommand(
             SupportedDataFileFormat.Csv => BuildImportDelimitedFileCommand(","),
             SupportedDataFileFormat.Tsv => BuildImportDelimitedFileCommand("\t"),
             SupportedDataFileFormat.Parquet => BuildImportParquetFileCommand(),
+            SupportedDataFileFormat.Json => BuildImportJsonFileCommand(),
             _ => throw new NotSupportedException($"Data file format {_dataFileFormat} is not supported.")
         };
     }
@@ -53,7 +54,7 @@ public class ImportFileSqlCommand(
     /// creates or replaces the destination table with the imported data, and includes an additional column for row 
     /// number. The delimiter parameter is set based on the specified data file format (comma for CSV and tab for TSV).
     /// </summary>
-    /// <param name="delimiter"></param>
+    /// <param name="delimiter">The string to use as the delimiter.</param>
     /// <returns>The generated SQL statement for importing delimited files.</returns>
     private string BuildImportDelimitedFileCommand(string delimiter)
     {
@@ -125,5 +126,33 @@ public class ImportFileSqlCommand(
             .GroupBy(kvp => kvp.Key)
             .ToDictionary(g => g.Key, g => g.Last().Value);
         return allColumnTypes.ToDuckDbMapLiteral();
+    }
+
+    /// <summary>
+    /// Builds a DuckDB SQL statement that imports data from JSON files defined by the _dataFileGlobPattern into a 
+    /// table defined by _tableName using the read_json function. The generated SQL statement creates or replaces
+    /// the destination table with the imported data, and includes an additional column for filename. The union_by_name
+    /// parameter is set to true to allow for combining multiple JSON files with potentially varying schemas.
+    /// </summary>
+    /// <returns>The generated SQL statement for importing JSON files.</returns>
+    private string BuildImportJsonFileCommand()
+    {
+        var allColumnTypesMapLiteral = PrepareColumnTypesMapLiteral(
+            _dateColumnNames, _decimalColumnNames, _integerColumnNames);
+
+        var typesLine = allColumnTypesMapLiteral == "{}"
+            ? string.Empty
+            : $",\n    columns = {allColumnTypesMapLiteral}";
+
+
+        return $"""
+            CREATE OR REPLACE TABLE {_tableName} AS
+            SELECT *, filename
+            FROM read_json(
+                '{_dataFileGlobPattern.EscapeSingleQuote()}'{typesLine},
+                format = 'auto',
+                union_by_name = true
+            );
+            """;
     }
 }
